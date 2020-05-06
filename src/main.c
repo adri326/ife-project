@@ -5,5 +5,5 @@
 #include "ai.h"
 
 int main(int argc, char* argv[]) {
-  printf("Hello world! test de Jules");
+  printf("Hello world! ");
 }
