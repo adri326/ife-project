@@ -1,5 +1,7 @@
 build/
 output/
+projet/bin
+projet/obj
 .DS_Store
 *.o
 *.obj
