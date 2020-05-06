@@ -1,0 +1,23 @@
+# depslib dependency file v1.0
+1588511319 source:c:\users\jules\onedrive - universite de technologie de belfort-montbeliard\tc02\ife\projet\ife-project\src\ai.c
+	"ai.h"
+
+1588511319 c:\users\jules\onedrive - universite de technologie de belfort-montbeliard\tc02\ife\projet\ife-project\src\ai.h
+
+1588511319 source:c:\users\jules\onedrive - universite de technologie de belfort-montbeliard\tc02\ife\projet\ife-project\src\display.c
+	"display.h"
+
+1588511319 c:\users\jules\onedrive - universite de technologie de belfort-montbeliard\tc02\ife\projet\ife-project\src\display.h
+
+1588511319 source:c:\users\jules\onedrive - universite de technologie de belfort-montbeliard\tc02\ife\projet\ife-project\src\main.c
+	<stdlib.h>
+	<stdio.h>
+	"display.h"
+	"rules.h"
+	"ai.h"
+
+1588511319 c:\users\jules\onedrive - universite de technologie de belfort-montbeliard\tc02\ife\projet\ife-project\src\rules.h
+
+1588511319 source:c:\users\jules\onedrive - universite de technologie de belfort-montbeliard\tc02\ife\projet\ife-project\src\rules.c
+	"rules.h"
+
