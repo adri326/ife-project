@@ -13,6 +13,7 @@ typedef enum CardColor CardColor;
 
 /** Represents a single card
 `value` corresponds to:
+- `0` -> Card used
 - `7` -> 7
 - `8` -> 8
 - `9` -> 9
@@ -32,11 +33,26 @@ typedef struct Card Card;
 struct Player {
   Card[7] cards;
   uint8_t n_cards; // number of cards currently held
+  int trick_points_total; //variable enabling a count of the points won each trick rather than having to stock all the cards won until the end of the 8 tricks
+  int declaration_points; //variable to count the declaration that the player did. If the team of the player does not have the highest value declaration, then this variable will be equal to 0
+  int tricks_won; //counts the number of tricks won by each player for the capot and general contracts
 };
 typedef struct Player Player;
 
+enum ContractType {
+ChosenColour,
+Coinche,
+Surcoinche,
+Capot,
+General
+};
+typedef enum ContractType ContractType;
+
+
 struct Game {
   Player[4] players;
+  ContractType ActiveContract;
+  int ContractPoints; //only if the active contract is a chosen colour, capot=250 or general=500. Otherwise =0
 }
 
 #endif // RULES_H
