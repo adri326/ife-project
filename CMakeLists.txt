@@ -18,8 +18,12 @@ set(
 
 add_executable(ife-project ${SRC_FILES} ${HEADER_FILES})
 
-if(MINGW)
+if(MINGW AND (NOT DEFINED MINGW_USE_SYSTEM_LIBRARIES))
   set(SDL2_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2-2.0.12/x86_64-w64-mingw32")
+  set(SDL2_GFX_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_gfx-1.0.4") # This library looks like a mess to me. You will have to figure out how to compile it for yourself beforehand
+  set(SDL2_IMAGE_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_image-2.0.5/x86_64-w64-mingw32")
+  set(SDL2_MIXER_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_image-2.0.5/x86_64-w64-mingw32")
+  set(SDL2_TTF_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_image-2.0.5/x86_64-w64-mingw32")
 endif(MINGW)
 
 find_package(SDL2 REQUIRED)
