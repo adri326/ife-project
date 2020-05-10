@@ -31,7 +31,7 @@ struct Card {
 typedef struct Card Card;
 
 struct Player {
-  Card[7] cards;
+  Card cards[8];
   uint8_t n_cards; // number of cards currently held
   int trick_points_total; //variable enabling a count of the points won each trick rather than having to stock all the cards won until the end of the 8 tricks
   int declaration_points; //variable to count the declaration that the player did. If the team of the player does not have the highest value declaration, then this variable will be equal to 0
@@ -50,7 +50,7 @@ typedef enum ContractType ContractType;
 
 
 struct Game {
-  Player[4] players;
+  Player players[4];
   ContractType ActiveContract;
   int ContractPoints; //only if the active contract is a chosen colour, capot=250 or general=500. Otherwise =0
 }

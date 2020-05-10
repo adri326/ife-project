@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 project(ife-project)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(CMAKE_C_STANDARD 11)
 
 set(SRC_FILES
   src/main.c
@@ -24,7 +26,7 @@ if(MINGW AND (NOT DEFINED MINGW_USE_SYSTEM_LIBRARIES))
   set(SDL2_IMAGE_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_image-2.0.5/x86_64-w64-mingw32")
   set(SDL2_MIXER_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_image-2.0.5/x86_64-w64-mingw32")
   set(SDL2_TTF_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_image-2.0.5/x86_64-w64-mingw32")
-endif(MINGW)
+endif()
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_gfx REQUIRED)
