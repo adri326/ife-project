@@ -53,6 +53,6 @@ struct Game {
   Player players[4];
   ContractType ActiveContract;
   int ContractPoints; //only if the active contract is a chosen colour, capot=250 or general=500. Otherwise =0
-}
+};
 
 #endif // RULES_H
