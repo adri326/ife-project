@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="projet" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="build/bin/debug/projet" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/obj/debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c11" />
+					<Add option="-g" />
+					<Add directory="lib/SDL2-2.0.12/x86_64-w64-mingw32/include" />
+					<Add directory="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include" />
+					<Add directory="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/include" />
+					<Add directory="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/include" />
+				</Compiler>
+				<Linker>
+					<Add library="lib/SDL2-2.0.12/x86_64-w64-mingw32/bin/SDL2.dll" />
+					<Add library="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin/SDL2_ttf.dll" />
+					<Add library="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin/libfreetype-6.dll" />
+					<Add library="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin/zlib1.dll" />
+					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin/libmpg123-0.dll" />
+					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin/libogg-0.dll" />
+					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin/libvorbis-0.dll" />
+					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin/libvorbisfile-3.dll" />
+					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin/SDL2_mixer.dll" />
+					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/libjpeg-9.dll" />
+					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/libpng16-16.dll" />
+					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/SDL2_image.dll" />
+					<Add directory="lib/SDL2-2.0.12/x86_64-w64-mingw32/bin" />
+					<Add directory="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin" />
+					<Add directory="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin" />
+					<Add directory="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="build/bin/release/projet" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/obj/release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wunreachable-code" />
+					<Add option="-std=c11" />
+					<Add directory="lib/SDL2-2.0.12/x86_64-w64-mingw32/include" />
+					<Add directory="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include" />
+					<Add directory="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/include" />
+					<Add directory="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-O1" />
+					<Add option="-static" />
+					<Add library="lib/SDL2-2.0.12/x86_64-w64-mingw32/bin/SDL2.dll" />
+					<Add library="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin/SDL2_ttf.dll" />
+					<Add library="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin/libfreetype-6.dll" />
+					<Add library="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin/zlib1.dll" />
+					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin/libmpg123-0.dll" />
+					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin/libogg-0.dll" />
+					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin/libvorbis-0.dll" />
+					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin/libvorbisfile-3.dll" />
+					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin/SDL2_mixer.dll" />
+					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/libjpeg-9.dll" />
+					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/libpng16-16.dll" />
+					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/SDL2_image.dll" />
+					<Add directory="lib/SDL2-2.0.12/x86_64-w64-mingw32/bin" />
+					<Add directory="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin" />
+					<Add directory="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin" />
+					<Add directory="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="src/ai.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ai.h" />
+		<Unit filename="src/display.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/display.h" />
+		<Unit filename="src/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/rules.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/rules.h" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
