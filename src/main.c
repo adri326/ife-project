@@ -3,6 +3,9 @@
 #include "display.h"
 #include "rules.h"
 #include "ai.h"
+
+// Otherwise the linker errors out due to SDL2 redefining `main` by default
+#define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
 int main(int argc, char* argv[]) {
