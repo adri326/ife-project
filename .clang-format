@@ -1,0 +1,13 @@
+BasedOnStyle: LLVM
+
+Language: Cpp
+
+PointerAlignment: Left
+AlignAfterOpenBracket: AlwaysBreak
+AlignOperands: false
+AlignTrailingComments: false
+BinPackArguments: false
+BinPackParameters: false
+ContinuationIndentWidth: 2
+IndentCaseLabels: true
+BreakBeforeBinaryOperators: NonAssignment
