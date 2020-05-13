@@ -54,10 +54,16 @@ enum Teams {
 typedef enum Teams Teams;
 
 struct Game {
-  Player players[4];
+  Player players[4]; /**
+  players: 0 = human/south,
+  1 = west
+  2 = north
+  3 = east */
   ContractType active_contract;
-  int contract_points; // only if the active contract is a chosen colour,
-                       // capot=250 or general=500. Otherwise =0
+  int contract_points; // to stock the points of the active contract
+                       // or of the contract contested by a coinche / surcoinche
+    int general_attacker; //only relevant for a general contract
+                            // to know what player to check
   TrumpColor active_trump; // to stock the active trump
   Teams winning_team;
   Teams contracted_team;
@@ -78,5 +84,22 @@ int turn_points(
   Teams active_team,
   Player looser1,
   Player looser2);
+
+  /**
+  The goal of the following function is to determine
+  either or not the contract was realized. To lighten
+  the code, for a coinche or surcoinche, the variable contract_points
+  will keep the points of the contract that was contested.
+  The function will then return which team won the 8 tricks turn by
+  telling if the contracted team filled the requirements or not.
+  */
+  Teams contract_check(
+   Game game);
+/**
+These functions will be used in the previous one to lighten the code and just realize a switch to enter the winning team.
+*/
+Teams attackers_win (Teams team_to_swicth);
+
+Teams defenders_win (Teams team_to_swicth);
 
 #endif // RULES_H

@@ -9,6 +9,7 @@
 #include <SDL2/SDL.h>
 
 int main(int argc, char* argv[]) {
+    Game game;
   Teams active_team; // variable that will help each time a function needs to
                      // know what team is concerned, e.g.: for the contracts
 
