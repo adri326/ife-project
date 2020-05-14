@@ -76,9 +76,9 @@ int turn_points(
 }
 
 Teams defenders_win(
-  Teams team_to_swicth) { // selects the opposite team of the one entered
+  Teams team_to_switch) { // selects the opposite team of the one entered
   Teams to_return;
-  switch (team_to_swicth) {
+  switch (team_to_switch) {
     case EW:
       to_return = NS;
       break;
@@ -89,9 +89,9 @@ Teams defenders_win(
   return to_return;
 }
 
-Teams attackers_win(Teams team_to_swicth) { // selects the team entered
+Teams attackers_win(Teams team_to_switch) { // selects the team entered
   Teams to_return;
-  switch (team_to_swicth) {
+  switch (team_to_switch) {
     case EW:
       to_return = EW;
       break;
@@ -99,7 +99,7 @@ Teams attackers_win(Teams team_to_swicth) { // selects the team entered
       to_return = NS;
       break;
   }
-  return team_to_swicth;
+  return team_to_switch;
 }
 
 Teams contract_check(Game game) {

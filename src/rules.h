@@ -98,8 +98,8 @@ Teams contract_check(Game game);
 /**
 These functions will be used in the previous one to lighten the code and just realize a switch to enter the winning team.
 */
-Teams attackers_win(Teams team_to_swicth);
+Teams attackers_win(Teams team_to_switch);
 
-Teams defenders_win(Teams team_to_swicth);
+Teams defenders_win(Teams team_to_switch);
 
 #endif // RULES_H
