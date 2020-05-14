@@ -85,21 +85,21 @@ int turn_points(
   Player looser1,
   Player looser2);
 
-  /**
-  The goal of the following function is to determine
-  either or not the contract was realized. To lighten
-  the code, for a coinche or surcoinche, the variable contract_points
-  will keep the points of the contract that was contested.
-  The function will then return which team won the 8 tricks turn by
-  telling if the contracted team filled the requirements or not.
-  */
-  Teams contract_check(
-   Game game);
+/**
+The goal of the following function is to determine
+either or not the contract was realized. To lighten
+the code, for a coinche or surcoinche, the variable contract_points
+will keep the points of the contract that was contested.
+The function will then return which team won the 8 tricks turn by
+telling if the contracted team filled the requirements or not.
+*/
+Teams contract_check(Game game);
+
 /**
 These functions will be used in the previous one to lighten the code and just realize a switch to enter the winning team.
 */
-Teams attackers_win (Teams team_to_swicth);
+Teams attackers_win(Teams team_to_swicth);
 
-Teams defenders_win (Teams team_to_swicth);
+Teams defenders_win(Teams team_to_swicth);
 
 #endif // RULES_H
