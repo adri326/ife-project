@@ -240,3 +240,95 @@ Teams contract_check(Game game) {
   }
   return winners;
 }
+
+int trick_points (Card card1, Card card2, Card card3, Card card4, Game game)
+{
+    int total; //to return
+    total = card_value(card1,game) + card_value(card2,game)
+            + card_value(card3,game) + card_value(card4,game);
+    //As announced, this function is a simple sum.
+    //The main part of this step in the game is
+    //coded in the function card_value.
+    if (game.players[0].n_cards==0)
+    { //To take into account the "10 of der".
+        total = total + 10;
+    }
+    return total;
+}
+
+int card_value (Card card, Game game)
+{
+    int value;//to return
+    switch (game.active_trump) //values depend mainly of the trump
+    {
+        case ALLTRUMP: switch (card.value)
+                        {
+                            case 9: value = 9; //9
+                                break;
+                            case 10: value = 5; //10
+                                break;
+                            case 11: value = 14; //Jack
+                                break;
+                            case 12: value = 1; //Queen
+                                break;
+                            case 13: value = 3; //King
+                                break;
+                            case 14: value = 6; //Ace
+                                break;
+                           default:  value = 0; //7 and 8
+                        }
+            break;
+        case NOTRUMP: switch (card.value)
+                        {
+                            case 10: value = 10; //10
+                                break;
+                            case 11: value = 2; //Jack
+                                break;
+                            case 12: value = 3; //Queen
+                                break;
+                            case 13: value = 4; //King
+                                break;
+                            case 14: value = 19; //Ace
+                                break;
+                           default:  value = 0; //7, 8 and 9
+                        }
+            break;
+            default: //for all the chosen colour trumps
+                    if (card.type==game.active_trump)
+                    { //We have to make a difference
+                      //between trump and non trump cards.
+                        switch (card.value)
+                        {
+                            case 9: value = 14; //9
+                                break;
+                            case 10: value = 10; //10
+                                break;
+                            case 11: value = 20; //Jack
+                                break;
+                            case 12: value = 3; //Queen
+                                break;
+                            case 13: value = 4; //King
+                                break;
+                            case 14: value = 11; //Ace
+                                break;
+                           default:  value = 0; //7 and 8
+                        }
+                    } else {
+                        switch (card.value)
+                        {
+                            case 10: value = 10; //10
+                                break;
+                            case 11: value = 2; //Jack
+                                break;
+                            case 12: value = 3; //Queen
+                                break;
+                            case 13: value = 4; //King
+                                break;
+                            case 14: value = 11; //Ace
+                                break;
+                           default:  value = 0; //7, 8 and 9
+                        }
+                    }
+    }
+    return value;
+}
