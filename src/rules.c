@@ -99,7 +99,7 @@ Teams attackers_win(Teams team_to_switch) { // selects the team entered
       to_return = NS;
       break;
   }
-  return team_to_switch;
+  return to_return;
 }
 
 Teams contract_check(Game game) {

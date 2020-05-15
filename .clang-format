@@ -11,3 +11,4 @@ BinPackParameters: false
 ContinuationIndentWidth: 2
 IndentCaseLabels: true
 BreakBeforeBinaryOperators: NonAssignment
+ColumnLimit: 100
