@@ -45,3 +45,6 @@ target_link_libraries(ife-project
   SDL2::SDL2mixer
   SDL2::SDL2ttf
 )
+
+# TODO: change this
+add_compile_definitions(RESOURCES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/resources/")

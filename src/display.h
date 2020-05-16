@@ -1,9 +1,39 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#include "rules.h"
 #include <stdbool.h>
 #include <inttypes.h>
 #include <SDL2/SDL.h>
+
+#ifndef RESOURCES_DIR
+#define RESOURCES_DIR "./resources/"
+#endif
+
+#define CARD_WIDTH 19
+#define CARD_HEIGHT 28
+#define NUM_WIDTH 5
+#define NUM_HEIGHT 5
+#define COLOR_WIDTH 9
+#define COLOR_HEIGHT 10
+#define NUM1_X 3
+#define NUM1_Y 3
+#define NUM2_X 11
+#define NUM2_Y 20
+#define COLOR_X 5
+#define COLOR_Y 9
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+  #define RMASK 0xff000000
+  #define GMASK 0x00ff0000
+  #define BMASK 0x0000ff00
+  #define AMASK 0x000000ff
+#else
+  #define RMASK 0x000000ff
+  #define GMASK 0x0000ff00
+  #define BMASK 0x00ff0000
+  #define AMASK 0xff000000
+#endif
 
 /** Zooms a surface; assumes that `dst`'s dimensions is an integer multiple of these of `src`.
 * Assumes that both `src` and `dst` are 32-bit RGBA surfaces.
@@ -25,5 +55,34 @@ SDL_Surface* zoom(SDL_Surface* src, uint32_t factor);
 * @param factor - The upscaling factor
 **/
 SDL_Rect zoom_rect(SDL_Rect* src, uint32_t factor);
+
+/** Loads card textures, upscales them by `factor`, stitches them together and stores them for later use.
+* Be sure to call `destroy_card_textures` later!
+* @param renderer - The current window renderer, used to generate the texture off surfaces
+* @param factor - The upscaling factor
+**/
+bool init_card_textures(SDL_Renderer* renderer, uint32_t factor);
+
+/** Destroys the textures allocated by `init_card_textures`
+**/
+void destroy_card_textures();
+
+/** Returns the SDL_Texture associated with the given card
+* @param color - The card color
+* @param number - The card value (cf. rules.h)
+**/
+SDL_Texture* get_texture(CardColor color, uint8_t number);
+
+/** Returns the SDL_Rect corresponding to the dimensions of a card texture **/
+SDL_Rect get_card_rect();
+
+/** Renders a card
+* @param renderer - The current renderer
+* @param color - The card color
+* @param number - The card value
+* @param state - The state of the card (0 = front, 1 = front highlighted, 2 = back, 3 = back highlighted)
+* @param dst - The destination coordinate
+**/
+void render_card(SDL_Renderer* renderer, CardColor color, uint8_t number, uint8_t state, SDL_Rect* dst);
 
 #endif // DISPLAY_H

@@ -3,9 +3,24 @@
 #include "rules.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <inttypes.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+
+#ifdef _WIN32
+  #define IS_WIN
+#endif
+#ifdef _WIN64
+  #define IS_WIN
+#endif
+#ifdef IS_WIN
+  #include <windows.h>
+  #define SLEEP(x) SleepEx(x, true)
+#else
+  #include <unistd.h>
+  #define SLEEP(x) usleep(x * 1000)
+#endif
 
 // Otherwise the linker errors out due to SDL2 redefining `main` by default
 #define SDL_MAIN_HANDLED
@@ -22,8 +37,8 @@ int main(int argc, char* argv[]) {
     "This needs a title",
     SDL_WINDOWPOS_UNDEFINED,
     SDL_WINDOWPOS_UNDEFINED,
-    512,
-    512,
+    (CARD_WIDTH + 2) * 8 * 4,
+    (CARD_HEIGHT + 2) * 4 * 4,
     0
   );
 
@@ -32,26 +47,52 @@ int main(int argc, char* argv[]) {
   SDL_RenderClear(renderer);
   SDL_RenderPresent(renderer);
 
-  SDL_Surface* test = IMG_Load("../resources/card_colors.png");
-  if (!test) {
+  if (!init_card_textures(renderer, 4)) {
     printf("Uh oh! %s\n", SDL_GetError());
   }
-  SDL_Surface* test2 = zoom(test, 4);
-  SDL_Texture* test2_tex = SDL_CreateTextureFromSurface(renderer, test2);
-  SDL_Rect src_rect = {
-    .x = 0,
-    .y = 0,
-    .w = 9,
-    .h = 10,
-  };
-  SDL_Rect src2_rect = zoom_rect(&src_rect, 4);
-  SDL_RenderCopy(renderer, test2_tex, &src2_rect, &src2_rect);
-  SDL_FreeSurface(test);
-  SDL_FreeSurface(test2);
-  SDL_DestroyTexture(test2_tex);
-  SDL_UpdateWindowSurface(window);
 
-  SDL_Delay(3000);
+  bool exit = false;
+  uint8_t state = 0;
+
+  while (!exit) {
+    SDL_SetRenderDrawColor(renderer, 128, 128, 128, SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(renderer);
+    for (CardColor color = 0; color < 4; color++) {
+      for (uint8_t num = 0; num < 8; num++) {
+        SDL_Rect dst_rect = get_card_rect();
+        dst_rect.x = num * (CARD_WIDTH + 2) * 4 + 1;
+        dst_rect.y = color * (CARD_HEIGHT + 2) * 4 + 1;
+        render_card(renderer, color, num, state, &dst_rect);
+      }
+    }
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_KEYUP) {
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
+            exit = true;
+            break;
+          case SDLK_1:
+            state = 0;
+            break;
+          case SDLK_2:
+            state = 1;
+            break;
+          case SDLK_3:
+            state = 2;
+            break;
+          case SDLK_4:
+            state = 3;
+            break;
+        }
+      } else if (event.type == SDL_QUIT) exit = true;
+    }
+    SLEEP(200);
+  }
+
+  destroy_card_textures();
   SDL_DestroyWindow(window);
   SDL_Quit();
 
