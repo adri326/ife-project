@@ -45,3 +45,16 @@ target_link_libraries(ife-project
   SDL2::SDL2mixer
   SDL2::SDL2ttf
 )
+
+
+project(ife-project-test)
+enable_testing()
+add_test(NAME ife-project-test COMMAND ife-project-test)
+
+add_executable(
+  ife-project-test
+  test/main.c
+  test/test.h
+  test/rules.c
+  test/rules.h
+)
