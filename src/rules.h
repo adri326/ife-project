@@ -62,8 +62,8 @@ struct Game {
   ContractType active_contract;
   int contract_points; // to stock the points of the active contract
                        // or of the contract contested by a coinche / surcoinche
-    int general_attacker; //only relevant for a general contract
-                            // to know what player to check
+  int general_attacker; // only relevant for a general contract
+                        // to know what player to check
   TrumpColor active_trump; // to stock the active trump
   Teams winning_team;
   Teams contracted_team;
@@ -96,8 +96,8 @@ telling if the contracted team filled the requirements or not.
 Teams contract_check(Game game);
 
 /**
-These functions will be used in the previous one to lighten the code and just realize
- a switch to enter the winning team.
+These functions will be used in the previous one to lighten the code and just
+realize a switch to enter the winning team.
 */
 Teams attackers_win(Teams team_to_switch);
 
@@ -107,12 +107,12 @@ Teams defenders_win(Teams team_to_switch);
 The following function will simply do a sum of the trick points.
 The identification of the value of each card will be done in an other function.
 */
-int trick_points (Card card1, Card card2, Card card3, Card card4, Game game);
+int trick_points(Card card1, Card card2, Card card3, Card card4, Game game);
 
 /**
 This function will identify the value of each card entered. Useful for
 the trick points but can also be used in other functions if needed.
 */
-int card_value (Card card, Game game);
+int card_value(Card card, Game game);
 
 #endif // RULES_H
