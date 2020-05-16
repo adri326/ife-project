@@ -28,7 +28,7 @@
 * Prints an error message if `a` != `b`
 * Returns `false` if `condition` yields false
 **/
-#define ASSERT_EQ(a, b) ASSERT((a) == (b))
+#define ASSERT_EQ(a, b) ASSERT_MSG((a) == (b))
 
 /** Asserts that `a` equals `b`:
 * Prints an error message if `a` != `b`
@@ -41,7 +41,7 @@
 * Prints the given description if the test yields false
 * Sets RES to false if the test yields false
 **/
-#define EXECUTE_TEST(name, ...) printf("Executing " #name "...\n"); if (!test_##name()) {printf("  ... %s: \"", #name); printf(__VA_ARGS__); printf("\"\n"); RES = false;}
+#define EXECUTE_TEST(name, ...) printf("Executing test \"" #name "\" ...\n"); if (!test_##name()) {printf("  ... %s: \"", #name); printf(__VA_ARGS__); printf("\"\n  ... %s: error!\n", #name); RES = false;}
 
 /** Executes the given test:
 * Prints the given description if the test fails

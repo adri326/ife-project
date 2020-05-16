@@ -70,6 +70,8 @@ struct Game {
 };
 typedef struct Game Game;
 
+// TODO: rename turn_points to game_points or final_points
+
 /**
 The goal of this function is to compute the points of a team at the end of a 8
 tricks turn. To do so, we give all the informations about the game and the 4

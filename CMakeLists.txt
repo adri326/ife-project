@@ -5,7 +5,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_C_STANDARD 11)
 
 set(SRC_FILES
-  src/main.c
   src/ai.c
   src/display.c
   src/rules.c
@@ -18,7 +17,7 @@ set(
   src/rules.h
 )
 
-add_executable(ife-project ${SRC_FILES} ${HEADER_FILES})
+add_executable(ife-project src/main.c ${SRC_FILES} ${HEADER_FILES})
 
 if(MINGW AND (NOT DEFINED MINGW_USE_SYSTEM_LIBRARIES))
   set(SDL2_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2-2.0.12/x86_64-w64-mingw32")
@@ -57,4 +56,5 @@ add_executable(
   test/test.h
   test/rules.c
   test/rules.h
+  ${SRC_FILES}
 )

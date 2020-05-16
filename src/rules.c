@@ -30,7 +30,7 @@ int turn_points(
           total = 2 * base_points + declaration_points;
           break;
         default:
-          total = base_points + declaration_points;
+          total = base_points;
       }
     } else {
       int base_points = 162 + game.contract_points + player1.declaration_points
