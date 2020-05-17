@@ -13,10 +13,10 @@ typedef enum CardColor CardColor;
 - `8` -> 8
 - `9` -> 9
 - `10` -> 10
-- `11` -> Jack
+- `11` -> Joker
 - `12` -> Queen
 - `13` -> King
-- `14` -> Ace
+- `14` -> As
 No differentiation is made between trump and non-trump cards here.
 */
 struct Card {
@@ -96,23 +96,10 @@ telling if the contracted team filled the requirements or not.
 Teams contract_check(Game game);
 
 /**
-These functions will be used in the previous one to lighten the code and just realize
- a switch to enter the winning team.
+These functions will be used in the previous one to lighten the code and just realize a switch to enter the winning team.
 */
 Teams attackers_win(Teams team_to_switch);
 
 Teams defenders_win(Teams team_to_switch);
-
-/**
-The following function will simply do a sum of the trick points.
-The identification of the value of each card will be done in an other function.
-*/
-int trick_points (Card card1, Card card2, Card card3, Card card4, Game game);
-
-/**
-This function will identify the value of each card entered. Useful for
-the trick points but can also be used in other functions if needed.
-*/
-int card_value (Card card, Game game);
 
 #endif // RULES_H
