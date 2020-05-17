@@ -41,7 +41,7 @@
 * Prints the given description if the test yields false
 * Sets RES to false if the test yields false
 **/
-#define EXECUTE_TEST(name, ...) printf("Executing test \"" #name "\" ...\n"); if (!test_##name()) {printf("  ... %s: \"", #name); printf(__VA_ARGS__); printf("\"\n  ... %s: error!\n", #name); RES = false;}
+#define EXECUTE_TEST(name, ...) printf("Executing test \"" #name "\" ...\n"); if (!test_##name()) {printf("  ... %s: \"", #name); printf(__VA_ARGS__); printf("\"\n  ... " #name ": error!\n"); RES = false;} else {printf("  ... " #name ": ok!\n");}
 
 /** Executes the given test:
 * Prints the given description if the test fails
@@ -53,7 +53,7 @@
 #define BEGIN_TEST(name) bool test_##name() {char CURR_TEST[1024] = #name; bool RES = true;
 
 /** Ends a test body **/
-#define END_TEST() if (RES) printf("... %s: ok!\n", CURR_TEST); else printf("... %s: error!\n", CURR_TEST); return RES;}
+#define END_TEST() return RES;}
 
 /** Declares a test **/
 #define DECL_TEST(name) bool test_##name(void);
