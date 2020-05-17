@@ -3,162 +3,117 @@
 // TODO: dedupe
 // TODO: more verbose argument naming?
 
-int turn_points(
-  Game game,
-  Player player1,
-  Player player2,
-  Teams active_team,
-  Player looser1,
-  Player looser2) {
-  // variable that will be returned and corresponds to the turn points we want
-  // to compute
-  int total = 0;
+int turn_points(Game game, Teams active_team) {
+  Player* player_1 = &game.players[active_team == NS ? 0 : 1];
+  Player* player_2 = &game.players[active_team == NS ? 2 : 3];
+  Player* looser_1 = &game.players[game.winning_team == EW ? 0 : 1];
+  Player* looser_2 = &game.players[game.winning_team == EW ? 2 : 3];
+
   if (active_team == game.winning_team) {
     if (active_team == game.contracted_team) {
-      int base_points = player1.trick_points_total + player2.trick_points_total
-        + player1.declaration_points + player2.declaration_points
-        + player1.belote + player2.belote + game.contract_points;
-      int declaration_points =
-        looser1.declaration_points + looser2.declaration_points;
+      int base_points = player_1->trick_points_total + player_2->trick_points_total
+        + player_1->declaration_points + player_2->declaration_points + player_1->belote
+        + player_2->belote + game.contract_points;
+      int declaration_points = looser_1->declaration_points + looser_2->declaration_points;
       // case: the team with the contract realizes it and gets more than 82
       // points, computing the points of this team
       switch (game.active_contract) {
         case SURCOINCHE:
-          total = 4 * base_points + declaration_points;
-          break;
+          return 4 * base_points + declaration_points;
         case COINCHE:
-          total = 2 * base_points + declaration_points;
-          break;
+          return 2 * base_points + declaration_points;
         default:
-          total = base_points;
+          return base_points;
       }
     } else {
-      int base_points = 162 + game.contract_points + player1.declaration_points
-        + player2.declaration_points + looser1.declaration_points
-        + looser2.declaration_points + player1.belote + player2.belote;
+      int base_points = 162 + game.contract_points + player_1->declaration_points
+        + player_2->declaration_points + looser_1->declaration_points + looser_2->declaration_points
+        + player_1->belote + player_2->belote;
       // case: the team with the contract doesn't realize it and we compute the
       // points of the defending team
       switch (game.active_contract) {
         case SURCOINCHE:
-          total = 4 * base_points;
-          break;
+          return 4 * base_points;
         case COINCHE:
-          total = 2 * base_points;
-          break;
+          return 2 * base_points;
         default:
-          total = base_points;
+          return base_points;
       }
     }
   } else {
     if (active_team == game.contracted_team) {
       // case: the team with the contract doesn't realize it and we compute
       // their points
-      total = player1.belote + player2.belote;
+      return player_1->belote + player_2->belote;
     } else {
       // case: the team with the contract realizes it and gets more than 82
       // points, computing the points of the defending team
       switch (game.active_contract) {
         case SURCOINCHE:
-          total = player1.belote + player2.belote;
-          break;
+          return player_1->belote + player_2->belote;
         case COINCHE:
-          total = player1.belote + player2.belote;
-          break;
+          return player_1->belote + player_2->belote;
         default:
-          total = player1.trick_points_total + player2.trick_points_total
-            + player1.declaration_points + player2.declaration_points
-            + player1.belote + player2.belote;
+          return player_1->trick_points_total + player_2->trick_points_total
+            + player_1->declaration_points + player_2->declaration_points + player_1->belote
+            + player_2->belote;
       }
     }
-  }
-
-  return total;
-}
-
-// TODO: remove these functions
-
-Teams defenders_win(Teams team_to_switch) {
-  // selects the opposite team of the one entered
-  switch (team_to_switch) {
-    case EW:
-      return NS;
-      break;
-    case NS:
-      return EW;
-      break;
-  }
-}
-
-Teams attackers_win(Teams team_to_switch) {
-  // selects the team entered
-  switch (team_to_switch) {
-    case EW:
-      return EW;
-      break;
-    case NS:
-      return NS;
-      break;
   }
 }
 
 Teams contract_check(Game game) {
-  int attacker1, attacker2, defender1, defender2;
-  Teams winners;
-  switch (game.contracted_team) // to easily manipulate the different player
-                                // structures afterwards
-  {
+  Player* attacker_1;
+  Player* attacker_2;
+  Player* defender_1;
+  Player* defender_2;
+
+  // to easily manipulate the different player structures afterwards
+  switch (game.contracted_team) {
     case EW:
-      attacker1 = 1;
-      attacker2 = 3;
-      defender1 = 0;
-      defender2 = 2;
+      attacker_1 = &game.players[1];
+      attacker_2 = &game.players[3];
+      defender_1 = &game.players[0];
+      defender_2 = &game.players[2];
       break;
     case NS:
-      attacker1 = 0;
-      attacker2 = 2;
-      defender1 = 1;
-      defender2 = 3;
+      attacker_1 = &game.players[0];
+      attacker_2 = &game.players[2];
+      defender_1 = &game.players[1];
+      defender_2 = &game.players[3];
       break;
   }
-  if (
-    game.players[attacker1].trick_points_total
-      + game.players[attacker2].trick_points_total
-    < 82) { // the team under contract didn't manage to win 82 points or more,
-            // the other team instantly wins
-    winners = defenders_win(game.contracted_team);
+  if (attacker_1->trick_points_total + attacker_2->trick_points_total < 82) {
+    // the team under contract didn't manage to win 82 points or more,
+    // the other team instantly wins
+    return defenders_win(game.contracted_team);
   } else {
     switch (game.active_contract) {
       case CHOSENCOLOUR: // the attackers need to have reached their goal amount
                          // of points, stocked in contract_points
         if (
-          game.players[attacker1].trick_points_total
-            + game.players[attacker2].trick_points_total
-            + game.players[attacker1].belote + game.players[attacker2].belote
-            + game.players[attacker1].declaration_points
-            + game.players[attacker2].declaration_points
+          attacker_1->trick_points_total + attacker_2->trick_points_total + attacker_1->belote
+            + attacker_2->belote + attacker_1->declaration_points + attacker_2->declaration_points
           < game.contract_points) {
-          winners = defenders_win(game.contracted_team);
+          return defenders_win(game.contracted_team);
         } else {
-          winners = attackers_win(game.contracted_team);
+          return attackers_win(game.contracted_team);
         }
         break;
       case CAPOT: // the attackers need to have won all tricks, so the two
                   // attackers together must have won 8 tricks
-        if (
-          game.players[attacker1].tricks_won
-            + game.players[attacker2].tricks_won
-          == 8) {
-          winners = attackers_win(game.contracted_team);
+        if (attacker_1->tricks_won + attacker_2->tricks_won == 8) {
+          return attackers_win(game.contracted_team);
         } else {
-          winners = defenders_win(game.contracted_team);
+          return defenders_win(game.contracted_team);
         }
         break;
       case GENERAL: // a single player needs to have won the 8 tricks. Their
                     // number is in general_attacker
         if (game.players[game.general_attacker].tricks_won == 8) {
-          winners = attackers_win(game.contracted_team);
+          return attackers_win(game.contracted_team);
         } else {
-          winners = defenders_win(game.contracted_team);
+          return defenders_win(game.contracted_team);
         }
         break;
       case COINCHE: // the defender team must not have filled their contract for
@@ -168,34 +123,28 @@ Teams contract_check(Game game) {
         // contract
         switch (game.contract_points) {
           case 250:
-            if (
-              game.players[defender1].tricks_won
-                + game.players[defender2].tricks_won
-              == 8) {
-              winners = defenders_win(game.contracted_team);
+            if (defender_1->tricks_won + defender_2->tricks_won == 8) {
+              return defenders_win(game.contracted_team);
             } else {
-              winners = attackers_win(game.contracted_team);
+              return attackers_win(game.contracted_team);
             }
             break;
           case 500:
             if (game.players[game.general_attacker].tricks_won == 8) {
-              winners = defenders_win(game.contracted_team);
+              return defenders_win(game.contracted_team);
             } else {
-              winners = attackers_win(game.contracted_team);
+              return attackers_win(game.contracted_team);
             }
             break;
           default:
             if (
-              game.players[defender1].trick_points_total
-                + game.players[defender2].trick_points_total
-                + game.players[defender1].belote
-                + game.players[defender2].belote
-                + game.players[defender1].declaration_points
-                + game.players[defender2].declaration_points
+              defender_1->trick_points_total + defender_2->trick_points_total + defender_1->belote
+                + defender_2->belote + defender_1->declaration_points
+                + defender_2->declaration_points
               < game.contract_points) {
-              winners = attackers_win(game.contracted_team);
+              return attackers_win(game.contracted_team);
             } else {
-              winners = defenders_win(game.contracted_team);
+              return defenders_win(game.contracted_team);
             }
         }
         break;
@@ -204,46 +153,41 @@ Teams contract_check(Game game) {
                        // surcoinche to be realized
         switch (game.contract_points) {
           case 250:
-            if (
-              game.players[attacker1].tricks_won
-                + game.players[attacker2].tricks_won
-              == 8) {
-              winners = attackers_win(game.contracted_team);
+            if (attacker_1->tricks_won + attacker_2->tricks_won == 8) {
+              return attackers_win(game.contracted_team);
             } else {
-              winners = defenders_win(game.contracted_team);
+              return defenders_win(game.contracted_team);
             }
             break;
           case 500:
             if (game.players[game.general_attacker].tricks_won == 8) {
-              winners = attackers_win(game.contracted_team);
+              return attackers_win(game.contracted_team);
             } else {
-              winners = defenders_win(game.contracted_team);
+              return defenders_win(game.contracted_team);
             }
             break;
           default:
             if (
-              game.players[attacker1].trick_points_total
-                + game.players[attacker2].trick_points_total
-                + game.players[attacker1].belote
-                + game.players[attacker2].belote
-                + game.players[attacker1].declaration_points
-                + game.players[attacker2].declaration_points
+              attacker_1->trick_points_total + attacker_2->trick_points_total + attacker_1->belote
+                + attacker_2->belote + attacker_1->declaration_points
+                + attacker_2->declaration_points
               < game.contract_points) {
-              winners = defenders_win(game.contracted_team);
+              return defenders_win(game.contracted_team);
             } else {
-              winners = attackers_win(game.contracted_team);
+              return attackers_win(game.contracted_team);
             }
         }
         break;
     }
   }
-  return winners;
+
+  return NS; // should not be reached
 }
 
 int trick_points(Card card1, Card card2, Card card3, Card card4, Game game) {
   int total; // to return
-  total = card_value(card1, game) + card_value(card2, game)
-    + card_value(card3, game) + card_value(card4, game);
+  total = card_value(card1, game) + card_value(card2, game) + card_value(card3, game)
+    + card_value(card4, game);
   // As announced, this function is a simple sum.
   // The main part of this step in the game is
   // coded in the function card_value.
@@ -291,7 +235,7 @@ int card_value(Card card, Game game) {
       }
       break;
     default: // for all the chosen colour trumps
-      if (card.type == game.active_trump) { // We have to make a difference
+      if ((int)card.type == (int)game.active_trump) { // We have to make a difference
                                             // between trump and non trump
                                             // cards.
         switch (card.value) {

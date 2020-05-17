@@ -44,7 +44,7 @@ typedef struct Player Player;
 enum ContractType { CHOSENCOLOUR, COINCHE, SURCOINCHE, CAPOT, GENERAL };
 typedef enum ContractType ContractType;
 
-enum TrumpColor { HEART, TILE, CLOVER, SPIKE, ALLTRUMP, NOTRUMP };
+enum TrumpColor { TRUMP_HEARTS, TRUMP_TILES, TRUMP_CLOVERS, TRUMP_SPIKES, ALLTRUMP, NOTRUMP };
 typedef enum TrumpColor TrumpColor;
 
 enum Teams {
@@ -82,13 +82,7 @@ players to the function. The function will then return the points of the wanted
 team which is an integer. This function doesn't check if the contract was
 realized or not, at this point we already know it. Another function will do it.
 */
-int turn_points(
-  Game game,
-  Player player1,
-  Player player2,
-  Teams active_team,
-  Player looser1,
-  Player looser2);
+int turn_points(Game game, Teams active_team);
 
 /**
 The goal of the following function is to determine
@@ -104,9 +98,9 @@ Teams contract_check(Game game);
 These functions will be used in the previous one to lighten the code and just
 realize a switch to enter the winning team.
 */
-Teams attackers_win(Teams team_to_switch);
+#define attackers_win(team_to_switch) (team_to_switch)
 
-Teams defenders_win(Teams team_to_switch);
+#define defenders_win(team_to_switch) (!(team_to_switch))
 
 /**
 The following function will simply do a sum of the trick points.

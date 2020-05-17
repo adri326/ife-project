@@ -3,10 +3,7 @@
 #include "rules.h"
 
 BEGIN_TEST(all) {
-  EXECUTE_TEST(turn_points, "Test the turn_points() function");
-  EXECUTE_TEST(contract_check, "Test the contract_check() function");
-  EXECUTE_TEST(card_value, "Test that card_value() returns the right card value");
-  EXECUTE_TEST(trick_points, "Test that trick_points() returns the sum of 4 card_value()");
+  EXECUTE_TEST(rules, "Checks associated to the rules defined in src/rules.c")
 }
 END_TEST()
 
