@@ -26,11 +26,19 @@
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
+void card_test();
+
 int main(int argc, char* argv[]) {
   // Game game;
   // Teams active_team; // variable that will help each time a function needs to
   //                    // know what team is concerned, e.g.: for the contracts
 
+  // card_test();
+
+  return 0;
+}
+
+void card_test() {
   SDL_Init(SDL_INIT_VIDEO);
 
   SDL_Window* window = SDL_CreateWindow(
@@ -96,6 +104,4 @@ int main(int argc, char* argv[]) {
   destroy_textures();
   SDL_DestroyWindow(window);
   SDL_Quit();
-
-  return 0;
 }
