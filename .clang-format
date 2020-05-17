@@ -11,3 +11,9 @@ BinPackParameters: false
 ContinuationIndentWidth: 2
 IndentCaseLabels: true
 BreakBeforeBinaryOperators: NonAssignment
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+# AllowShortEnumsOnASingleLine: false
+# Apparently this isn't here anymore?
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: true

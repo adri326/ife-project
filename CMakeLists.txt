@@ -5,7 +5,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_C_STANDARD 11)
 
 set(SRC_FILES
-  src/main.c
   src/ai.c
   src/display.c
   src/rules.c
@@ -18,7 +17,7 @@ set(
   src/rules.h
 )
 
-add_executable(ife-project ${SRC_FILES} ${HEADER_FILES})
+add_executable(ife-project src/main.c ${SRC_FILES} ${HEADER_FILES})
 
 if(MINGW AND (NOT DEFINED MINGW_USE_SYSTEM_LIBRARIES))
   set(SDL2_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2-2.0.12/x86_64-w64-mingw32")
@@ -45,3 +44,30 @@ target_link_libraries(ife-project
   SDL2::SDL2mixer
   SDL2::SDL2ttf
 )
+
+
+project(ife-project-test)
+enable_testing()
+add_test(NAME ife-project-test COMMAND ife-project-test)
+
+add_executable(
+  ife-project-test
+  test/main.c
+  test/test.h
+  test/rules.c
+  test/rules.h
+  ${SRC_FILES}
+)
+
+set(NO_TEST_DEPTH "false" CACHE STRING "true or false")
+
+if(NO_TEST_DEPTH STREQUAL "true")
+  message("TEST_DEPTH disabled.")
+  add_compile_definitions(NO_TEST_DEPTH)
+else()
+  message("TEST_DEPTH enabled. Disable with -DNO_TEST_DEPTH=true if you experience issues with global variables in the test files")
+endif()
+
+if(NOT MSVC)
+  target_compile_options(ife-project-test BEFORE PUBLIC "SHELL:-Wno-unused-variable")
+endif()

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="ife-project-test" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Test">
+				<Option output="build/bin/test/ife-project-test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/obj/test/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-Wno-unused-variable" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="src/rules.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/rules.h" />
+		<Unit filename="test/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="test/rules.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="test/rules.h" />
+		<Unit filename="test/test.h" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

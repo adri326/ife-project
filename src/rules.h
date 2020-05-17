@@ -20,7 +20,7 @@ typedef enum CardColor CardColor;
 No differentiation is made between trump and non-trump cards here.
 */
 struct Card {
-  CardColor type;
+  CardColor type; // TODO: rename to `color`
   uint8_t value;
 };
 typedef struct Card Card;
@@ -72,6 +72,8 @@ struct Game {
                // the position of its player.
 };
 typedef struct Game Game;
+
+// TODO: rename turn_points to game_points or final_points
 
 /**
 The goal of this function is to compute the points of a team at the end of a 8

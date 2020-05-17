@@ -30,7 +30,7 @@ int turn_points(
           total = 2 * base_points + declaration_points;
           break;
         default:
-          total = base_points + declaration_points;
+          total = base_points;
       }
     } else {
       int base_points = 162 + game.contract_points + player1.declaration_points
@@ -75,8 +75,10 @@ int turn_points(
   return total;
 }
 
-Teams defenders_win(
-  Teams team_to_switch) { // selects the opposite team of the one entered
+// TODO: remove these functions
+
+Teams defenders_win(Teams team_to_switch) {
+  // selects the opposite team of the one entered
   switch (team_to_switch) {
     case EW:
       return NS;
@@ -87,7 +89,8 @@ Teams defenders_win(
   }
 }
 
-Teams attackers_win(Teams team_to_switch) { // selects the team entered
+Teams attackers_win(Teams team_to_switch) {
+  // selects the team entered
   switch (team_to_switch) {
     case EW:
       return EW;
@@ -257,22 +260,16 @@ int card_value(Card card, Game game) {
       switch (card.value) {
         case 9:
           return 9; // 9
-          break;
         case 10:
           return 5; // 10
-          break;
         case 11:
           return 14; // Jack
-          break;
         case 12:
           return 1; // Queen
-          break;
         case 13:
           return 3; // King
-          break;
         case 14:
           return 6; // Ace
-          break;
         default:
           return 0; // 7 and 8
       }
@@ -281,19 +278,14 @@ int card_value(Card card, Game game) {
       switch (card.value) {
         case 10:
           return 10; // 10
-          break;
         case 11:
           return 2; // Jack
-          break;
         case 12:
           return 3; // Queen
-          break;
         case 13:
           return 4; // King
-          break;
         case 14:
           return 19; // Ace
-          break;
         default:
           return 0; // 7, 8 and 9
       }
@@ -305,22 +297,16 @@ int card_value(Card card, Game game) {
         switch (card.value) {
           case 9:
             return 14; // 9
-            break;
           case 10:
             return 10; // 10
-            break;
           case 11:
             return 20; // Jack
-            break;
           case 12:
             return 3; // Queen
-            break;
           case 13:
             return 4; // King
-            break;
           case 14:
             return 11; // Ace
-            break;
           default:
             return 0; // 7 and 8
         }
@@ -328,19 +314,14 @@ int card_value(Card card, Game game) {
         switch (card.value) {
           case 10:
             return 10; // 10
-            break;
           case 11:
             return 2; // Jack
-            break;
           case 12:
             return 3; // Queen
-            break;
           case 13:
             return 4; // King
-            break;
           case 14:
             return 11; // Ace
-            break;
           default:
             return 0; // 7, 8 and 9
         }
