@@ -67,6 +67,9 @@ struct Game {
   TrumpColor active_trump; // to stock the active trump
   Teams winning_team;
   Teams contracted_team;
+  Card pli[4]; //to stock the cards played during a trick.
+                //the number of the card corresponds to
+                //the position of its player.
 };
 typedef struct Game Game;
 

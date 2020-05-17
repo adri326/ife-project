@@ -77,29 +77,25 @@ int turn_points(
 
 Teams defenders_win(
   Teams team_to_switch) { // selects the opposite team of the one entered
-  Teams to_return;
   switch (team_to_switch) {
     case EW:
-      to_return = NS;
+      return NS;
       break;
     case NS:
-      to_return = EW;
+      return EW;
       break;
   }
-  return to_return;
 }
 
 Teams attackers_win(Teams team_to_switch) { // selects the team entered
-  Teams to_return;
   switch (team_to_switch) {
     case EW:
-      to_return = EW;
+      return EW;
       break;
     case NS:
-      to_return = NS;
+      return NS;
       break;
   }
-  return team_to_switch;
 }
 
 Teams contract_check(Game game) {
@@ -258,39 +254,38 @@ int trick_points (Card card1, Card card2, Card card3, Card card4, Game game)
 
 int card_value (Card card, Game game)
 {
-    int value;//to return
     switch (game.active_trump) //values depend mainly of the trump
     {
         case ALLTRUMP: switch (card.value)
                         {
-                            case 9: value = 9; //9
+                            case 9: return 9; //9
                                 break;
-                            case 10: value = 5; //10
+                            case 10: return 5; //10
                                 break;
-                            case 11: value = 14; //Jack
+                            case 11: return 14; //Jack
                                 break;
-                            case 12: value = 1; //Queen
+                            case 12: return 1; //Queen
                                 break;
-                            case 13: value = 3; //King
+                            case 13: return 3; //King
                                 break;
-                            case 14: value = 6; //Ace
+                            case 14: return 6; //Ace
                                 break;
-                           default:  value = 0; //7 and 8
+                           default:  return 0; //7 and 8
                         }
             break;
         case NOTRUMP: switch (card.value)
                         {
-                            case 10: value = 10; //10
+                            case 10: return 10; //10
                                 break;
-                            case 11: value = 2; //Jack
+                            case 11: return 2; //Jack
                                 break;
-                            case 12: value = 3; //Queen
+                            case 12: return 3; //Queen
                                 break;
-                            case 13: value = 4; //King
+                            case 13: return 4; //King
                                 break;
-                            case 14: value = 19; //Ace
+                            case 14: return 19; //Ace
                                 break;
-                           default:  value = 0; //7, 8 and 9
+                           default:  return 0; //7, 8 and 9
                         }
             break;
             default: //for all the chosen colour trumps
@@ -299,36 +294,35 @@ int card_value (Card card, Game game)
                       //between trump and non trump cards.
                         switch (card.value)
                         {
-                            case 9: value = 14; //9
+                            case 9: return 14; //9
                                 break;
-                            case 10: value = 10; //10
+                            case 10: return 10; //10
                                 break;
-                            case 11: value = 20; //Jack
+                            case 11: return 20; //Jack
                                 break;
-                            case 12: value = 3; //Queen
+                            case 12: return 3; //Queen
                                 break;
-                            case 13: value = 4; //King
+                            case 13: return 4; //King
                                 break;
-                            case 14: value = 11; //Ace
+                            case 14: return 11; //Ace
                                 break;
-                           default:  value = 0; //7 and 8
+                           default:  return 0; //7 and 8
                         }
                     } else {
                         switch (card.value)
                         {
-                            case 10: value = 10; //10
+                            case 10: return 10; //10
                                 break;
-                            case 11: value = 2; //Jack
+                            case 11: return 2; //Jack
                                 break;
-                            case 12: value = 3; //Queen
+                            case 12: return 3; //Queen
                                 break;
-                            case 13: value = 4; //King
+                            case 13: return 4; //King
                                 break;
-                            case 14: value = 11; //Ace
+                            case 14: return 11; //Ace
                                 break;
-                           default:  value = 0; //7, 8 and 9
+                           default:  return 0; //7, 8 and 9
                         }
                     }
     }
-    return value;
 }
