@@ -1,4 +1,5 @@
 #include "rules.h"
+#include <stdlib.h>
 
 BEGIN_TEST(turn_points) {
   Player player_1 = {
@@ -354,5 +355,24 @@ CARD_VALUE_TEST(card_value_alltrump, ALLTRUMP, HEARTS, 0, 0, 9, 5, 14, 1, 3, 6)
 CARD_VALUE_TEST(card_value_notrump, NOTRUMP, HEARTS, 0, 0, 0, 10, 2, 3, 4, 19)
 CARD_VALUE_TEST(card_value_trump, HEARTS, HEARTS, 0, 0, 14, 10, 20, 3, 4, 11)
 CARD_VALUE_TEST(card_value_not_trump, HEARTS, CLOVERS, 0, 0, 0, 10, 2, 3, 4, 11)
+
+BEGIN_TEST(trick_points) {
+  // 50 random tests
+  for (int n = 0; n < 50; n++) {
+    Game game = {
+      .active_trump = rand() % 6, .players = {{.n_cards = rand() % 2}}};
+    Card card1 = {.value = 7 + rand() % 8, .type = rand() % 4};
+    Card card2 = {.value = 7 + rand() % 8, .type = rand() % 4};
+    Card card3 = {.value = 7 + rand() % 8, .type = rand() % 4};
+    Card card4 = {.value = 7 + rand() % 8, .type = rand() % 4};
+    ASSERT_EQ_PRI(
+      card_value(card1, game) + card_value(card2, game)
+        + card_value(card3, game) + card_value(card4, game)
+        + (game.players[0].n_cards == 0 ? 10 : 0),
+      trick_points(card1, card2, card3, card4, game),
+      "%d");
+  }
+}
+END_TEST()
 
 // TODO: all of the other cases

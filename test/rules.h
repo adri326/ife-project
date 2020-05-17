@@ -8,5 +8,6 @@
 DECL_TEST(turn_points)
 DECL_TEST(contract_check)
 DECL_TEST(card_value)
+DECL_TEST(trick_points)
 
 #endif // TEST_RULES_H
