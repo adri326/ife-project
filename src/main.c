@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
   SDL_RenderClear(renderer);
   SDL_RenderPresent(renderer);
 
-  if (!init_card_textures(renderer, 4)) {
+  if (!init_textures(renderer, 4)) {
     printf("Uh oh! %s\n", SDL_GetError());
   }
 
@@ -65,6 +65,7 @@ int main(int argc, char* argv[]) {
         render_card(renderer, color, num, state, &dst_rect);
       }
     }
+    // render_text(renderer, "Hello, world!", 4, 4, 0);
     SDL_RenderPresent(renderer);
 
     SDL_Event event;
@@ -92,7 +93,7 @@ int main(int argc, char* argv[]) {
     SLEEP(200);
   }
 
-  destroy_card_textures();
+  destroy_textures();
   SDL_DestroyWindow(window);
   SDL_Quit();
 
