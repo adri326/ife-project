@@ -6,5 +6,7 @@
 #include "test.h"
 
 DECL_TEST(turn_points)
+DECL_TEST(contract_check)
+DECL_TEST(card_value)
 
 #endif // TEST_RULES_H

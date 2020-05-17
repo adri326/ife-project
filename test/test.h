@@ -37,6 +37,13 @@
 **/
 #define ASSERT_EQ_MSG(a, b, ...) ASSERT_MSG((a) == (b), __VA_ARGS__)
 
+/** Asserts that `a` equals `b`:
+* Prints an error message if `a` != `b`
+* Prints the `a` and `b` if `a` != `b` using `fmt`
+* Returns `false` if `condition` yields false
+**/
+#define ASSERT_EQ_PRI(a, b, fmt) ASSERT_MSG((a) == (b), "Expected " fmt " to be equal to " fmt ".", b, a)
+
 /** Executes the given test:
 * Prints the given description if the test yields false
 * Sets RES to false if the test yields false

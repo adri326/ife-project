@@ -20,7 +20,7 @@ typedef enum CardColor CardColor;
 No differentiation is made between trump and non-trump cards here.
 */
 struct Card {
-  CardColor type;
+  CardColor type; // TODO: rename to `color`
   uint8_t value;
 };
 typedef struct Card Card;
