@@ -56,7 +56,8 @@ add_executable(
   test/test.h
   test/rules.c
   test/rules.h
-  ${SRC_FILES}
+  src/rules.c
+  src/rules.h
 )
 
 set(NO_TEST_DEPTH "false" CACHE STRING "true or false")
@@ -71,3 +72,6 @@ endif()
 if(NOT MSVC)
   target_compile_options(ife-project-test BEFORE PUBLIC "SHELL:-Wno-unused-variable")
 endif()
+
+# TODO: change this
+add_compile_definitions(RESOURCES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/resources/")

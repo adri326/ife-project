@@ -17,3 +17,4 @@ AllowShortCaseLabelsOnASingleLine: false
 # Apparently this isn't here anymore?
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: true
+ColumnLimit: 100
