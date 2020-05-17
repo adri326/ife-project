@@ -237,92 +237,113 @@ Teams contract_check(Game game) {
   return winners;
 }
 
-int trick_points (Card card1, Card card2, Card card3, Card card4, Game game)
-{
-    int total; //to return
-    total = card_value(card1,game) + card_value(card2,game)
-            + card_value(card3,game) + card_value(card4,game);
-    //As announced, this function is a simple sum.
-    //The main part of this step in the game is
-    //coded in the function card_value.
-    if (game.players[0].n_cards==0)
-    { //To take into account the "10 of der".
-        total = total + 10;
-    }
-    return total;
+int trick_points(Card card1, Card card2, Card card3, Card card4, Game game) {
+  int total; // to return
+  total = card_value(card1, game) + card_value(card2, game)
+    + card_value(card3, game) + card_value(card4, game);
+  // As announced, this function is a simple sum.
+  // The main part of this step in the game is
+  // coded in the function card_value.
+  if (game.players[0].n_cards == 0) { // To take into account the "10 of der".
+    total = total + 10;
+  }
+  return total;
 }
 
-int card_value (Card card, Game game)
-{
-    switch (game.active_trump) //values depend mainly of the trump
-    {
-        case ALLTRUMP: switch (card.value)
-                        {
-                            case 9: return 9; //9
-                                break;
-                            case 10: return 5; //10
-                                break;
-                            case 11: return 14; //Jack
-                                break;
-                            case 12: return 1; //Queen
-                                break;
-                            case 13: return 3; //King
-                                break;
-                            case 14: return 6; //Ace
-                                break;
-                           default:  return 0; //7 and 8
-                        }
+int card_value(Card card, Game game) {
+  switch (game.active_trump) // values depend mainly of the trump
+  {
+    case ALLTRUMP:
+      switch (card.value) {
+        case 9:
+          return 9; // 9
+          break;
+        case 10:
+          return 5; // 10
+          break;
+        case 11:
+          return 14; // Jack
+          break;
+        case 12:
+          return 1; // Queen
+          break;
+        case 13:
+          return 3; // King
+          break;
+        case 14:
+          return 6; // Ace
+          break;
+        default:
+          return 0; // 7 and 8
+      }
+      break;
+    case NOTRUMP:
+      switch (card.value) {
+        case 10:
+          return 10; // 10
+          break;
+        case 11:
+          return 2; // Jack
+          break;
+        case 12:
+          return 3; // Queen
+          break;
+        case 13:
+          return 4; // King
+          break;
+        case 14:
+          return 19; // Ace
+          break;
+        default:
+          return 0; // 7, 8 and 9
+      }
+      break;
+    default: // for all the chosen colour trumps
+      if (card.type == game.active_trump) { // We have to make a difference
+                                            // between trump and non trump
+                                            // cards.
+        switch (card.value) {
+          case 9:
+            return 14; // 9
             break;
-        case NOTRUMP: switch (card.value)
-                        {
-                            case 10: return 10; //10
-                                break;
-                            case 11: return 2; //Jack
-                                break;
-                            case 12: return 3; //Queen
-                                break;
-                            case 13: return 4; //King
-                                break;
-                            case 14: return 19; //Ace
-                                break;
-                           default:  return 0; //7, 8 and 9
-                        }
+          case 10:
+            return 10; // 10
             break;
-            default: //for all the chosen colour trumps
-                    if (card.type==game.active_trump)
-                    { //We have to make a difference
-                      //between trump and non trump cards.
-                        switch (card.value)
-                        {
-                            case 9: return 14; //9
-                                break;
-                            case 10: return 10; //10
-                                break;
-                            case 11: return 20; //Jack
-                                break;
-                            case 12: return 3; //Queen
-                                break;
-                            case 13: return 4; //King
-                                break;
-                            case 14: return 11; //Ace
-                                break;
-                           default:  return 0; //7 and 8
-                        }
-                    } else {
-                        switch (card.value)
-                        {
-                            case 10: return 10; //10
-                                break;
-                            case 11: return 2; //Jack
-                                break;
-                            case 12: return 3; //Queen
-                                break;
-                            case 13: return 4; //King
-                                break;
-                            case 14: return 11; //Ace
-                                break;
-                           default:  return 0; //7, 8 and 9
-                        }
-                    }
-    }
+          case 11:
+            return 20; // Jack
+            break;
+          case 12:
+            return 3; // Queen
+            break;
+          case 13:
+            return 4; // King
+            break;
+          case 14:
+            return 11; // Ace
+            break;
+          default:
+            return 0; // 7 and 8
+        }
+      } else {
+        switch (card.value) {
+          case 10:
+            return 10; // 10
+            break;
+          case 11:
+            return 2; // Jack
+            break;
+          case 12:
+            return 3; // Queen
+            break;
+          case 13:
+            return 4; // King
+            break;
+          case 14:
+            return 11; // Ace
+            break;
+          default:
+            return 0; // 7, 8 and 9
+        }
+      }
+  }
 }
