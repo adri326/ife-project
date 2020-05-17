@@ -58,3 +58,16 @@ add_executable(
   test/rules.h
   ${SRC_FILES}
 )
+
+set(NO_TEST_DEPTH "false" CACHE STRING "true or false")
+
+if(NO_TEST_DEPTH STREQUAL "true")
+  message("TEST_DEPTH disabled.")
+  add_compile_definitions(NO_TEST_DEPTH)
+else()
+  message("TEST_DEPTH enabled. Disable with -DNO_TEST_DEPTH=true if you experience issues with global variables in the test files")
+endif()
+
+if(NOT MSVC)
+  target_compile_options(ife-project-test BEFORE PUBLIC "SHELL:-Wno-unused-variable")
+endif()

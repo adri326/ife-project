@@ -4,6 +4,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#ifdef NO_TEST_DEPTH
+  #define TEST_DEPTH 0
+#else
+  #ifdef MAIN_C
+  size_t TEST_DEPTH = 0;
+  #else
+  extern size_t TEST_DEPTH;
+  #endif
+#endif
+
 /** Prints where the assert errored out **/
 #ifdef __LINE__
   #define ASSERT_LOCATION() printf(" (in %s:%d)", CURR_TEST, __LINE__);
@@ -11,18 +21,32 @@
   #define ASSERT_LOCATION() printf(" (in %s)", CURR_TEST);
 #endif
 
+#ifdef NO_TEST_DEPTH
+  // Empty implementations
+  #define ASSERT_INDENT()
+  #define INC_TEST_DEPTH()
+  #define DEC_TEST_DEPTH()
+#else
+  /** Indents the logs by TEST_DEPTH **/
+  #define ASSERT_INDENT() for (size_t indent_count = 0; indent_count < TEST_DEPTH; indent_count++) {printf("  ");}
+  /** Increments TEST_DEPTH **/
+  #define INC_TEST_DEPTH() TEST_DEPTH++;
+  /** Decrements TEST_DEPTH **/
+  #define DEC_TEST_DEPTH() TEST_DEPTH--;
+#endif
+
 /** Asserts that `condition` yields true:
 * Prints an error message if `condition` yields false
 * Returns `false` if `condition` yields false
 **/
-#define ASSERT(condition) if (!(condition)) {printf("  Assertion failed!"); ASSERT_LOCATION(); printf("\n"); return false;}
+#define ASSERT(condition) if (!(condition)) {ASSERT_INDENT(); printf("Assertion failed!"); ASSERT_LOCATION(); printf("\n"); return false;}
 
 /** Asserts that `condition` yields true:
 * Prints an error message if `condition` yields false
 * Prints the given value if `condition` yields false
 * Returns `false` if `condition` yields false
 **/
-#define ASSERT_MSG(condition, ...) if (!(condition)) {printf("  Assertion failed"); ASSERT_LOCATION(); printf(": \""); printf(__VA_ARGS__); printf("\"\n"); return false;}
+#define ASSERT_MSG(condition, ...) if (!(condition)) {ASSERT_INDENT(); printf("Assertion failed"); ASSERT_LOCATION(); printf(": \""); printf(__VA_ARGS__); printf("\"\n"); return false;}
 
 /** Asserts that `a` equals `b`:
 * Prints an error message if `a` != `b`
@@ -48,13 +72,7 @@
 * Prints the given description if the test yields false
 * Sets RES to false if the test yields false
 **/
-#define EXECUTE_TEST(name, ...) printf("Executing test \"" #name "\" ...\n"); if (!test_##name()) {printf("  ... %s: \"", #name); printf(__VA_ARGS__); printf("\"\n  ... " #name ": error!\n"); RES = false;} else {printf("  ... " #name ": ok!\n");}
-
-/** Executes the given test:
-* Prints the given description if the test fails
-* Returns false if the test fails
-**/
-#define ASSERT_TEST(name, ...) if (!name()) {printf("... \""); printf(__VA_ARGS__); printf("\"\n"); return false;}
+#define EXECUTE_TEST(name, ...) {ASSERT_INDENT(); printf("Executing test \"" #name "\" ...\n"); INC_TEST_DEPTH(); if (!test_##name()) {ASSERT_INDENT(); printf("... %s: \"", #name); printf(__VA_ARGS__); printf("\"\n"); ASSERT_INDENT(); printf("... " #name ": error!\n"); RES = false;} else {ASSERT_INDENT(); printf("... " #name ": ok!\n");} DEC_TEST_DEPTH();}
 
 /** Declares a test body **/
 #define BEGIN_TEST(name) bool test_##name() {char CURR_TEST[1024] = #name; bool RES = true;

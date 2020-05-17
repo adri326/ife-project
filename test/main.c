@@ -1,3 +1,4 @@
+#define MAIN_C
 #include "test.h"
 #include "rules.h"
 
