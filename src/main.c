@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <inttypes.h>
+
+// Otherwise the linker errors out due to SDL2 redefining `main` by default
+#define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
@@ -22,10 +25,6 @@
   #define SLEEP(x) usleep(x * 1000)
 #endif
 
-// Otherwise the linker errors out due to SDL2 redefining `main` by default
-#define SDL_MAIN_HANDLED
-#include <SDL2/SDL.h>
-
 void card_test();
 
 int main(int argc, char* argv[]) {
@@ -33,7 +32,7 @@ int main(int argc, char* argv[]) {
   // Teams active_team; // variable that will help each time a function needs to
   //                    // know what team is concerned, e.g.: for the contracts
 
-  // card_test();
+  card_test();
 
   return 0;
 }

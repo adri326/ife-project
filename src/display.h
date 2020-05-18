@@ -4,6 +4,7 @@
 #include "rules.h"
 #include <stdbool.h>
 #include <inttypes.h>
+#define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
 #ifndef RESOURCES_DIR

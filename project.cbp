@@ -29,12 +29,6 @@
 					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/libjpeg-9.dll" />
 					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/libpng16-16.dll" />
 					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/SDL2_image.dll" />
-
-					<Add library="lib/SDL2-2.0.12/x86_64-w64-mingw32/lib/libSDL2.la" />
-					<Add library="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/lib/libSDL2_ttf.la" />
-					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/lib/libSDL2_mixer.la" />
-					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/lib/libSDL2_image.la" />
-
 					<Add directory="lib/SDL2-2.0.12/x86_64-w64-mingw32/bin" />
 					<Add directory="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin" />
 					<Add directory="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin" />
@@ -66,12 +60,6 @@
 					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/libjpeg-9.dll" />
 					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/libpng16-16.dll" />
 					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/bin/SDL2_image.dll" />
-
-					<Add library="lib/SDL2-2.0.12/x86_64-w64-mingw32/lib/libSDL2.la" />
-					<Add library="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/lib/libSDL2_ttf.la" />
-					<Add library="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/lib/libSDL2_mixer.la" />
-					<Add library="lib/SDL2_image-2.0.5/x86_64-w64-mingw32/lib/libSDL2_image.la" />
-
 					<Add directory="lib/SDL2-2.0.12/x86_64-w64-mingw32/bin" />
 					<Add directory="lib/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin" />
 					<Add directory="lib/SDL2_mixer-2.0.4/x86_64-w64-mingw32/bin" />
