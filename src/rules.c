@@ -236,8 +236,8 @@ int card_value(Card card, Game game) {
       break;
     default: // for all the chosen colour trumps
       if ((int)card.type == (int)game.active_trump) { // We have to make a difference
-                                            // between trump and non trump
-                                            // cards.
+                                                     // between trump and non trump
+                                                    // cards.
         switch (card.value) {
           case 9:
             return 14; // 9
@@ -267,8 +267,179 @@ int card_value(Card card, Game game) {
           case 14:
             return 11; // Ace
           default:
-            return 0; // 7, 8 and 9
+            return 0; // 7, 8 and 9 + VOIDCARD/0 unused spot
         }
       }
   }
 }
+
+int move_check (Game game, Card card,int position,int* cut,int leader_position) {
+    int check=1; //will be used for the for statements
+    Player* player = &game.players[position];
+    if (game.active_trump==ALLTRUMP||game.active_trump==NOTRUMP)
+    { //no cut possible
+        if (card.type==game.trick_colour) {
+            return 1; //easiest case, everything is good
+        } else {
+            for (int i=0; i<8; i++)
+            { //wrong colour, we need to check the hand first
+                if (player->cards[i].type==game.trick_colour)
+                {
+                    check=0;
+                }
+            }
+            return check;
+        }
+    } else { //chosen colour, trick can be cut
+        switch (game.trick_cut)
+        {
+        case 1: //the trick was cut, only trump matters
+            if ((int)card.type == (int)game.active_trump)
+            { //the player plays the trump, everything is ok
+                return 1;
+            } else { //the player tries to play an other colour
+                    //we have to check their hand first
+                    for (int i=0; i<8; i++)
+                    {
+                        if ((int)player->cards[i].type==(int)game.active_trump)
+                        {
+                            check=0;
+                        }
+                    }
+                    return check;
+            }
+            break;
+        case 0: //the trick was not cut, the player can decide to cut
+            if (card.type==game.trick_colour)
+            { //the player plays the right colour, everything is ok
+                return 1;
+            } else { //the player can only play a card of the wrong
+                    //colour if he has no more cards of the colour in hand
+                for (int i=0; i<8; i++)
+                { // we check the hand first
+                    if (player->cards[i].type==game.trick_colour)
+                    {
+                        check=0;
+                    }
+                }
+                switch (check)
+                {
+                    case 0: //the player still have the right colour
+                            //in hand, he can't play something else
+                        return 0;
+                        break;
+                    case 1: //the player doesn't have the right colour
+                        if ((int)card.type == (int)game.active_trump)
+                        { //player cuts
+                            *cut = 1; //variable trick_cut shows that the player cut
+                            return 1;
+                        } else { //we have to check if player still has a trump
+                          for (int i=0;i<8;i++)
+                          { //no need to reset check, it is =1 in this case
+                            if ((int)player->cards[i].type==(int)game.active_trump)
+                            {
+                                check=0; //means that the player still has
+                            }           //a trump in his hands
+                          }
+                          switch (check)
+                          {
+                          case 1: //the player has no trump in hand, nothing more to ask
+                            return 1;
+                            break;
+                          case 0: //this case is very specific. The player wants to play
+                                  //a non trump card while he still has a trump in hand.
+                                  //He is allowed to do so only if their partner leads.
+                            if (leader_position==(position+2)%4)
+                                //we check if the player's ally is winning
+                            { //they do, the move is allowed
+                                return 1;
+                            } else { //they don't, the move is impossible
+                                return 0;
+                            }
+                            break;
+                          }
+                        }
+                        break;
+                }
+            }
+            break;
+        }
+    }
+}
+
+int leader_trick(Game game, int position,int current_leader_position,int* cut)
+{
+    Card* card1=&game.pli[(position+1)%4]; //to check either it is
+    Card* card2=&game.pli[(position+2)%4]; //the first move of the trick
+    Card* card3=&game.pli[(position+3)%4]; //or not
+    Card* player_card=&game.pli[position];
+    Card* leader_card=&game.pli[current_leader_position];
+    if (card1->type==VOIDCARD&&card2->type==VOIDCARD&&card3->type==VOIDCARD)
+    { //it is the first move
+        if ((int)player_card->type==(int)game.active_trump)
+        { //we initialize the cut variable by determining if the trick colour
+            //is the trump or not
+            *cut=1;
+        } else {
+            *cut = 0;
+        }
+        return position;
+    } else {
+        switch (game.trick_cut) //the "best" colour are changed if the trick
+                                //was not cut
+        {
+        case 1: //trick was cut, we only have to check for trumps
+            if ((int)leader_card->type==(int)game.active_trump) { //leader played trump
+                if ((int)player_card->type==(int)game.active_trump)
+                { //player played trump, we need to compare the values
+                    if (card_value(player_card,game)>card_value(leader_card,game))
+                    { //a better card is played
+                        return position;
+                    } else {
+                        if (card_value(player_card,game)<card_value(leader_card,game))
+                        { //a worst card is played
+                            return current_leader_position;
+                        } else { //player and leader played 7 and 8 trump
+                            if (player_card->value>leader_card->value)
+                            {
+                                return position;
+                            } else {
+                                return current_leader_position;
+                            }
+                        }
+                    }
+                } else { //player didn't play trump, can't win against a trump
+                    return current_leader_position;
+                }
+            } else { //leader didn't play trump, player cut
+                return position;
+            }
+            break;
+        case 0: //trick wasn't cut, leader has played the right colour
+                //(the opposite is impossible here)
+            if(player_card->type==game.trick_colour)
+            { //player played the right colour, we need to compare values
+                if (card_value(player_card,game)>card_value(leader_card,game))
+                { //a better card is played
+                    return position;
+                } else {
+                    if (card_value(player_card,game)<card_value(leader_card,game))
+                    { //a worst card is played
+                        return current_leader_position;
+                    } else { //player and leader played 7 and 8 right colour
+                        if (player_card->value>leader_card->value)
+                        {
+                            return position;
+                        } else {
+                            return current_leader_position;
+                        }
+                    }
+                }
+            } else { //can't win against the good colour without cutting
+                return current_leader_position;
+            }
+            break;
+        }
+    }
+}
+

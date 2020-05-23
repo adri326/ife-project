@@ -3,12 +3,14 @@
 
 #include <inttypes.h>
 
-enum CardColor { HEARTS, TILES, CLOVERS, SPIKES };
+//VOID represents an empty slot in order not to interfere with hand checks
+//or trick played card checks
+enum CardColor { HEARTS, TILES, CLOVERS, SPIKES, VOIDCARD };
 typedef enum CardColor CardColor;
 
 /** Represents a single card
 `value` corresponds to:
-- `0` -> Card used
+- `0` -> Card used or slot unfilled
 - `7` -> 7
 - `8` -> 8
 - `9` -> 9
@@ -70,6 +72,13 @@ struct Game {
   Card pli[4]; // to stock the cards played during a trick.
                // the number of the card corresponds to
                // the position of its player.
+  CardColor trick_colour; //to stock the colour of each trick to
+                            //then compare it to the card played
+  int trick_cut; //=0 if not, =1 if cut, reset to 0 at the beginning of a trick
+                 //except if the trump is a chosen colour and the trick colour
+                 //is the same colour as the trump. In this specific case it
+                 //takes the value 1. A function will do this.
+  int trick_leader_position; //to know who is winning the trick
 };
 typedef struct Game Game;
 
@@ -105,6 +114,7 @@ realize a switch to enter the winning team.
 /**
 The following function will simply do a sum of the trick points.
 The identification of the value of each card will be done in an other function.
+The "10 of der" is computed too.
 */
 int trick_points(Card card1, Card card2, Card card3, Card card4, Game game);
 
@@ -113,5 +123,37 @@ This function will identify the value of each card entered. Useful for
 the trick points but can also be used in other functions if needed.
 */
 int card_value(Card card, Game game);
+
+/**
+The following function must determine during a trick if a move is possible
+or not. For this, we need to give the function all the required informations
+about the game and played card and the position of the player in case we need
+to check their hand. The function will return 0 if the move is impossible and
+1 otherwise so that we can easily put a control with error message in main.
+The check is done for any player so that we can use it to control the AI
+if needed. We also need to be able to modify the trick_cut variable if
+needed that's why we transmit it with a pointer. Finally, for the very
+specific case where the player has a trump, no right colour for a chosen
+colour trump, and does not want to cut which is possible if the player's
+ally is leading the trick, we need to have the position of the trick leader.
+*/
+int move_check (Game game, Card card,int position,int* cut,int leader_position);
+
+/**
+We now need a function that determines, if the move was possible, who
+is leading after the move. It will return the position of the leader by
+simply comparing the former leader's card to the last card played.
+Therefore this function will be called after each move.
+The first player to make a move during a trick will automatically
+be set as leader by the function. To do so, we need the general informations of game,
+the position of the last player to have made a move, and the current
+leader's position which will correspond to the variable trick_leader_position.
+If it is the first move of the trick, this variable won't matter.
+This same variable will then take the value returned by this function in the main.
+This function will also initialize the trick_cut variable on the first move of a trick.
+*/
+int leader_trick(Game game, int position,int current_leader_position,int* cut);
+
+
 
 #endif // RULES_H
