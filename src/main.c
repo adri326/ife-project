@@ -1,10 +1,10 @@
 #include "ai.h"
 #include "display.h"
 #include "rules.h"
+#include <inttypes.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <inttypes.h>
 
 // Otherwise the linker errors out due to SDL2 redefining `main` by default
 #define SDL_MAIN_HANDLED
@@ -12,17 +12,17 @@
 #include <SDL2/SDL_image.h>
 
 #ifdef _WIN32
-  #define IS_WIN
+#define IS_WIN
 #endif
 #ifdef _WIN64
-  #define IS_WIN
+#define IS_WIN
 #endif
 #ifdef IS_WIN
-  #include <windows.h>
-  #define SLEEP(x) SleepEx(x, true)
+#include <windows.h>
+#define SLEEP(x) SleepEx(x, true)
 #else
-  #include <unistd.h>
-  #define SLEEP(x) usleep(x * 1000)
+#include <unistd.h>
+#define SLEEP(x) usleep(x * 1000)
 #endif
 
 void card_test();
@@ -46,17 +46,15 @@ void card_test() {
     SDL_WINDOWPOS_UNDEFINED,
     (CARD_WIDTH + 2) * 8 * 4,
     (CARD_HEIGHT + 2) * 4 * 4,
-    0
-  );
+    0);
 
-  SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE); // TODO: use hardware renderer
+  SDL_Renderer* renderer =
+    SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE); // TODO: use hardware renderer
   SDL_SetRenderDrawColor(renderer, 128, 128, 128, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
   SDL_RenderPresent(renderer);
 
-  if (!init_textures(renderer, 4)) {
-    printf("Uh oh! %s\n", SDL_GetError());
-  }
+  if (!init_textures(renderer, 4)) { printf("Uh oh! %s\n", SDL_GetError()); }
 
   bool exit = false;
   uint8_t state = 0;
@@ -95,7 +93,8 @@ void card_test() {
             state = 3;
             break;
         }
-      } else if (event.type == SDL_QUIT) exit = true;
+      } else if (event.type == SDL_QUIT)
+        exit = true;
     }
     SLEEP(200);
   }

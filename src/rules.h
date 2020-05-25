@@ -3,8 +3,8 @@
 
 #include <inttypes.h>
 
-//VOID represents an empty slot in order not to interfere with hand checks
-//or trick played card checks
+// VOID represents an empty slot in order not to interfere with hand checks
+// or trick played card checks
 enum CardColor { HEARTS, TILES, CLOVERS, SPIKES, VOIDCARD };
 typedef enum CardColor CardColor;
 
@@ -72,13 +72,13 @@ struct Game {
   Card pli[4]; // to stock the cards played during a trick.
                // the number of the card corresponds to
                // the position of its player.
-  CardColor trick_colour; //to stock the colour of each trick to
-                            //then compare it to the card played
+  CardColor trick_colour; // to stock the colour of each trick to
+                          // then compare it to the card played
   int trick_cut; //=0 if not, =1 if cut, reset to 0 at the beginning of a trick
-                 //except if the trump is a chosen colour and the trick colour
-                 //is the same colour as the trump. In this specific case it
-                 //takes the value 1. A function will do this.
-  int trick_leader_position; //to know who is winning the trick
+                 // except if the trump is a chosen colour and the trick colour
+                 // is the same colour as the trump. In this specific case it
+                 // takes the value 1. A function will do this.
+  int trick_leader_position; // to know who is winning the trick
 };
 typedef struct Game Game;
 
@@ -137,7 +137,7 @@ specific case where the player has a trump, no right colour for a chosen
 colour trump, and does not want to cut which is possible if the player's
 ally is leading the trick, we need to have the position of the trick leader.
 */
-int move_check (Game game, Card card,int position,int* cut,int leader_position);
+int move_check(Game game, Card card, int position, int* cut, int leader_position);
 
 /**
 We now need a function that determines, if the move was possible, who
@@ -152,8 +152,6 @@ If it is the first move of the trick, this variable won't matter.
 This same variable will then take the value returned by this function in the main.
 This function will also initialize the trick_cut variable on the first move of a trick.
 */
-int leader_trick(Game game, int position,int current_leader_position,int* cut);
-
-
+int leader_trick(Game game, int position, int current_leader_position, int* cut);
 
 #endif // RULES_H
