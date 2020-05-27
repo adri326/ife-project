@@ -8,6 +8,7 @@ set(SRC_FILES
   src/ai.c
   src/display.c
   src/rules.c
+  src/game.c
 )
 
 set(
@@ -15,6 +16,7 @@ set(
   src/ai.h
   src/display.h
   src/rules.h
+  src/game.h
 )
 
 add_executable(ife-project src/main.c ${SRC_FILES} ${HEADER_FILES})
@@ -57,8 +59,12 @@ add_executable(
   test/test.h
   test/rules.c
   test/rules.h
+  test/game.c
+  test/game.h
   src/rules.c
   src/rules.h
+  src/game.c
+  src/game.h
 )
 
 set(NO_TEST_DEPTH "false" CACHE STRING "true or false")

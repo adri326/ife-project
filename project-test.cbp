@@ -24,6 +24,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/rules.h" />
+		<Unit filename="src/game.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/game.h" />
 		<Unit filename="test/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -31,6 +35,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="test/rules.h" />
+		<Unit filename="test/game.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="test/game.h" />
 		<Unit filename="test/test.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

@@ -14,6 +14,8 @@ extern size_t TEST_DEPTH;
 #endif
 #endif
 
+#define TEST_ENV
+
 /** Prints where the assert errored out **/
 #ifdef __LINE__
 #define ASSERT_LOCATION() printf(" (in %s:%d)", CURR_TEST, __LINE__);
