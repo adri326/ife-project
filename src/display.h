@@ -13,6 +13,7 @@
 
 #define CARD_WIDTH 19
 #define CARD_HEIGHT 28
+#define DECK_PADDING 0
 #define NUM_WIDTH 5
 #define NUM_HEIGHT 5
 #define COLOR_WIDTH 9
@@ -113,5 +114,9 @@ void render_glyph(SDL_Renderer* renderer, char glyph, int32_t x, int32_t y, uint
 * @param color - The color of the glyph
 **/
 void render_text(SDL_Renderer* renderer, char* glyphs, int32_t x, int32_t y, uint8_t color);
+
+void render_deck(SDL_Renderer* renderer, Player* player, uint32_t x, uint32_t y, int selected_card);
+
+int get_hovered_card(Player* player, uint32_t deck_x, uint32_t deck_y, int32_t mouse_x, int32_t mouse_y);
 
 #endif // DISPLAY_H

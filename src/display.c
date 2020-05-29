@@ -340,3 +340,33 @@ void render_text(SDL_Renderer* renderer, char* glyphs, int32_t x, int32_t y, uin
     glyphs++;
   }
 }
+
+void render_deck(SDL_Renderer* renderer, Player* player, uint32_t x, uint32_t y, int selected_card) {
+  uint32_t sx = x - (CARD_WIDTH + DECK_PADDING) * zoom_factor * player->n_cards / 2 + DECK_PADDING * zoom_factor / 2;
+  for (size_t n = 0; n < player->n_cards; n++) {
+    SDL_Rect dst_rect = {
+      .x = sx + (CARD_WIDTH + DECK_PADDING) * n * zoom_factor,
+      .y = y + DECK_PADDING * zoom_factor,
+      .w = CARD_WIDTH * zoom_factor,
+      .h = CARD_HEIGHT * zoom_factor
+    };
+    render_card(renderer, player->cards[n].type, player->cards[n].value - 7, selected_card == n, &dst_rect);
+  }
+}
+
+int get_hovered_card(Player* player, uint32_t deck_x, uint32_t deck_y, int32_t mouse_x, int32_t mouse_y) {
+  uint32_t sx = deck_x - (CARD_WIDTH + DECK_PADDING) * zoom_factor * player->n_cards / 2 + DECK_PADDING * zoom_factor / 2;
+  uint32_t ex = deck_x + (CARD_WIDTH + DECK_PADDING) * zoom_factor * player->n_cards / 2 - DECK_PADDING * zoom_factor / 2;
+  if (mouse_x < sx) return -1;
+  if (mouse_x > ex) return -1;
+  if (mouse_y < deck_y + DECK_PADDING * zoom_factor || mouse_y > deck_y + (CARD_HEIGHT + DECK_PADDING) * zoom_factor) return -1;
+  for (size_t n = 0; n < player->n_cards; n++) {
+    if (
+      mouse_x >= sx + (CARD_WIDTH + DECK_PADDING) * n * zoom_factor &&
+      mouse_x <= sx + (CARD_WIDTH + DECK_PADDING) * n * zoom_factor + CARD_WIDTH * zoom_factor
+    ) {
+      return n;
+    }
+  }
+  return -1;
+}
