@@ -32,14 +32,14 @@ struct Player {
   uint8_t cards_revealed; // bitmap of the cards that were revealed before the first round
   uint8_t n_cards; // number of cards currently held
   int trick_points_total; // variable enabling a count of the points won each
-                          // trick rather than having to stock all the cards won
-                          // until the end of the 8 tricks
+    // trick rather than having to stock all the cards won
+    // until the end of the 8 tricks
   int declaration_points; // variable to count the declaration that the player
-                          // did. If the team of the player does not have the
-                          // highest value declaration, then this variable will
-                          // be equal to 0.
+    // did. If the team of the player does not have the
+    // highest value declaration, then this variable will
+    // be equal to 0.
   int tricks_won; // counts the number of tricks won by each player for the
-                  // capot and general contracts
+    // capot and general contracts
   int belote; // =0 if no belot, = 20 if belot
 };
 typedef struct Player Player;
@@ -64,21 +64,21 @@ struct Game {
   3 = east */
   ContractType active_contract;
   int contract_points; // to stock the points of the active contract
-                       // or of the contract contested by a coinche / surcoinche
+    // or of the contract contested by a coinche / surcoinche
   int general_attacker; // only relevant for a general contract
-                        // to know what player to check
+    // to know what player to check
   TrumpColor active_trump; // to stock the active trump
   Teams winning_team;
   Teams contracted_team;
   Card pli[4]; // to stock the cards played during a trick.
-               // the number of the card corresponds to
-               // the position of its player.
+    // the number of the card corresponds to
+    // the position of its player.
   CardColor trick_colour; // to stock the colour of each trick to
-                          // then compare it to the card played
+    // then compare it to the card played
   int trick_cut; //=0 if not, =1 if cut, reset to 0 at the beginning of a trick
-                 // except if the trump is a chosen colour and the trick colour
-                 // is the same colour as the trump. In this specific case it
-                 // takes the value 1. A function will do this.
+    // except if the trump is a chosen colour and the trick colour
+    // is the same colour as the trump. In this specific case it
+    // takes the value 1. A function will do this.
   int trick_leader_position; // to know who is winning the trick
 };
 typedef struct Game Game;

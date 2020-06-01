@@ -2,8 +2,8 @@
 #define DISPLAY_H
 
 #include "rules.h"
-#include <stdbool.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
@@ -30,15 +30,15 @@
 #define GLYPH_MARGIN 1
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-  #define RMASK 0xff000000
-  #define GMASK 0x00ff0000
-  #define BMASK 0x0000ff00
-  #define AMASK 0x000000ff
+#define RMASK 0xff000000
+#define GMASK 0x00ff0000
+#define BMASK 0x0000ff00
+#define AMASK 0x000000ff
 #else
-  #define RMASK 0x000000ff
-  #define GMASK 0x0000ff00
-  #define BMASK 0x00ff0000
-  #define AMASK 0xff000000
+#define RMASK 0x000000ff
+#define GMASK 0x0000ff00
+#define BMASK 0x00ff0000
+#define AMASK 0xff000000
 #endif
 
 /** Zooms a surface; assumes that `dst`'s dimensions is an integer multiple of these of `src`.
@@ -62,8 +62,8 @@ SDL_Surface* zoom(SDL_Surface* src, uint32_t factor);
 **/
 SDL_Rect zoom_rect(SDL_Rect* src, uint32_t factor);
 
-/** Loads all of the textures, upscales them by `factor`, stitches them together and stores them for later use.
-* Be sure to call `destroy_textures` later!
+/** Loads all of the textures, upscales them by `factor`, stitches them together and stores them for
+* later use. Be sure to call `destroy_textures` later!
 * @param renderer - The current window renderer, used to generate the texture off surfaces
 * @param factor - The upscaling factor
 **/
@@ -86,10 +86,16 @@ SDL_Rect get_card_rect();
 * @param renderer - The current renderer
 * @param color - The card color
 * @param number - The card value
-* @param state - The state of the card (0 = front, 1 = front highlighted, 2 = back, 3 = back highlighted)
+* @param state - The state of the card (0 = front, 1 = front highlighted, 2 = back, 3 = back
+* highlighted)
 * @param dst - The destination coordinate
 **/
-void render_card(SDL_Renderer* renderer, CardColor color, uint8_t number, uint8_t state, SDL_Rect* dst);
+void render_card(
+  SDL_Renderer* renderer,
+  CardColor color,
+  uint8_t number,
+  uint8_t state,
+  SDL_Rect* dst);
 
 /** Colorizes a white/transparent RGBA glyph
 * @param glyph - The glyph surface
@@ -115,12 +121,44 @@ void render_glyph(SDL_Renderer* renderer, char glyph, int32_t x, int32_t y, uint
 **/
 void render_text(SDL_Renderer* renderer, char* glyphs, int32_t x, int32_t y, uint8_t color);
 
+/** Renders the player's deck
+* @param renderer - The current renderer
+* @param player - The player's structure
+* @param x - The x position of the deck's center
+* @param y - The y position of the deck's top
+**/
 void render_deck(SDL_Renderer* renderer, Player* player, uint32_t x, uint32_t y, int selected_card);
 
-int get_hovered_card(Player* player, uint32_t deck_x, uint32_t deck_y, int32_t mouse_x, int32_t mouse_y);
+/** Returns which card of the deck is hovered
+* @param player - The player's structure
+* @param deck_x - The x position of the deck's center
+* @param deck_y - The y position of the deck's top
+* @param mouse_x - The mouse X position
+* @param mouse_y - The mouse Y position
+* @returns -1 if no card is hovered, u ∈ [0; 8) otherwise
+**/
+int get_hovered_card(
+  Player* player,
+  uint32_t deck_x,
+  uint32_t deck_y,
+  int32_t mouse_x,
+  int32_t mouse_y);
 
+/** Renders the cards at the center of the board
+* @param renderer - The current renderer
+* @param game - The current Game
+* @param offset - The round's offset (which player started the round)
+* @param x - Center of the board
+* @param y - Center of the board
+**/
 void render_round(SDL_Renderer* renderer, Game* game, size_t offset, uint32_t x, uint32_t y);
 
+/** Renders an opponent's deck
+* @param renderer - The current renderer
+* @param ai - The AI's Player struct
+* @param x - The deck's top left corner's X coordinate
+* @param y - The deck's top left corner's Y coordinate
+**/
 void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y);
 
 #endif // DISPLAY_H

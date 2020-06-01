@@ -1,6 +1,6 @@
 #include "display.h"
-#include <ctype.h>
 #include <SDL2/SDL_image.h>
+#include <ctype.h>
 
 bool zoom_surface(SDL_Surface* src, SDL_Surface* dst) {
   if (src->w == 0 || src->h == 0) return false;
@@ -27,7 +27,8 @@ bool zoom_surface(SDL_Surface* src, SDL_Surface* dst) {
         if (sub_x == factor - 1) {
           sub_x = 0;
           src_p++;
-        } else sub_x++;
+        } else
+          sub_x++;
 
         dst_p++;
       }
@@ -38,18 +39,15 @@ bool zoom_surface(SDL_Surface* src, SDL_Surface* dst) {
 }
 
 SDL_Surface* zoom(SDL_Surface* src, uint32_t factor) {
-  SDL_Surface* dst = SDL_CreateRGBSurface(0, src->w * factor, src->h * factor, 32, RMASK, GMASK, BMASK, AMASK);
+  SDL_Surface* dst =
+    SDL_CreateRGBSurface(0, src->w * factor, src->h * factor, 32, RMASK, GMASK, BMASK, AMASK);
   zoom_surface(src, dst);
   return dst;
 }
 
 SDL_Rect zoom_rect(SDL_Rect* src, uint32_t factor) {
-  SDL_Rect res = {
-    .x = src->x * factor,
-    .y = src->y * factor,
-    .w = src->w * factor,
-    .h = src->h * factor
-  };
+  SDL_Rect res =
+    {.x = src->x * factor, .y = src->y * factor, .w = src->w * factor, .h = src->h * factor};
   return res;
 }
 
@@ -102,21 +100,27 @@ bool init_textures(SDL_Renderer* renderer, uint32_t factor) {
 
   for (size_t color = 0; color < 4; color++) {
     for (size_t num = 0; num < 8; num++) {
-      SDL_Surface* tmp_surface = SDL_CreateRGBSurface(0, CARD_WIDTH * factor, CARD_HEIGHT * factor, 32, RMASK, GMASK, BMASK, AMASK);
+      SDL_Surface* tmp_surface = SDL_CreateRGBSurface(
+        0,
+        CARD_WIDTH * factor,
+        CARD_HEIGHT * factor,
+        32,
+        RMASK,
+        GMASK,
+        BMASK,
+        AMASK);
 
       SDL_Rect num_src = {
         .x = NUM_WIDTH * (7 - num) * factor,
         .y = color < 2 ? NUM_HEIGHT * factor : 0,
         .w = NUM_WIDTH * factor,
-        .h = NUM_HEIGHT * factor
-      };
+        .h = NUM_HEIGHT * factor};
 
       SDL_Rect color_src = {
         .x = (num == 7 ? 2 : num > 3 ? 1 : 0) * factor * COLOR_WIDTH,
         .y = color * COLOR_HEIGHT * factor,
         .w = COLOR_WIDTH * factor,
-        .h = COLOR_HEIGHT * factor
-      };
+        .h = COLOR_HEIGHT * factor};
 
       if (SDL_BlitSurface(nums, &num_src, tmp_surface, &num1_dst)) return false;
       if (SDL_BlitSurface(nums, &num_src, tmp_surface, &num2_dst)) return false;
@@ -165,19 +169,21 @@ bool init_textures(SDL_Renderer* renderer, uint32_t factor) {
   for (size_t y = 0; y < 8; y++) {
     for (size_t x = 0; x < 8; x++) {
       for (size_t color = 0; color < 16; color++) {
-        SDL_Surface* tmp_surface = SDL_CreateRGBSurface(0, GLYPH_WIDTH * factor, GLYPH_HEIGHT * factor, 32, RMASK, GMASK, BMASK, AMASK);
+        SDL_Surface* tmp_surface = SDL_CreateRGBSurface(
+          0,
+          GLYPH_WIDTH * factor,
+          GLYPH_HEIGHT * factor,
+          32,
+          RMASK,
+          GMASK,
+          BMASK,
+          AMASK);
         SDL_Rect src = {
           .x = GLYPH_WIDTH * factor * x,
           .y = GLYPH_HEIGHT * factor * y,
           .w = GLYPH_WIDTH * factor,
-          .h = GLYPH_HEIGHT * factor
-        };
-        SDL_Rect dst = {
-          .x = 0,
-          .y = 0,
-          .w = GLYPH_WIDTH * factor,
-          .h = GLYPH_HEIGHT * factor
-        };
+          .h = GLYPH_HEIGHT * factor};
+        SDL_Rect dst = {.x = 0, .y = 0, .w = GLYPH_WIDTH * factor, .h = GLYPH_HEIGHT * factor};
         if (SDL_BlitSurface(glyphs_surface, &src, tmp_surface, &dst)) return false;
         colorize_glyph(tmp_surface, glyph_colors[color]);
         glyphs[color][x][y] = SDL_CreateTextureFromSurface(renderer, tmp_surface);
@@ -220,17 +226,22 @@ SDL_Rect get_card_rect() {
   return res;
 }
 
-void render_card(SDL_Renderer* renderer, CardColor color, uint8_t number, uint8_t state, SDL_Rect* dst) {
+void render_card(
+  SDL_Renderer* renderer,
+  CardColor color,
+  uint8_t number,
+  uint8_t state,
+  SDL_Rect* dst) {
   SDL_Rect outline_src = {
     .x = color == VOIDCARD ? card_rect.w * 4 : card_rect.w * state,
     .y = 0,
     .w = card_rect.w,
-    .h = card_rect.h
-  };
+    .h = card_rect.h};
   SDL_Rect card_src = get_card_rect();
 
   SDL_RenderCopy(renderer, outlines, &outline_src, dst);
-  if (state < 2 && color != VOIDCARD) SDL_RenderCopy(renderer, get_texture(color, number), &card_src, dst);
+  if (state < 2 && color != VOIDCARD)
+    SDL_RenderCopy(renderer, get_texture(color, number), &card_src, dst);
 }
 
 void colorize_glyph(SDL_Surface* glyph, uint32_t color) {
@@ -253,18 +264,8 @@ void colorize_glyph(SDL_Surface* glyph, uint32_t color) {
 
 void render_glyph(SDL_Renderer* renderer, char glyph, int32_t x, int32_t y, uint8_t color) {
   if (color >= 16) return;
-  SDL_Rect src = {
-    .x = 0,
-    .y = 0,
-    .w = GLYPH_WIDTH * zoom_factor,
-    .h = GLYPH_HEIGHT * zoom_factor
-  };
-  SDL_Rect dst = {
-    .x = x,
-    .y = y,
-    .w = GLYPH_WIDTH * zoom_factor,
-    .h = GLYPH_HEIGHT * zoom_factor
-  };
+  SDL_Rect src = {.x = 0, .y = 0, .w = GLYPH_WIDTH * zoom_factor, .h = GLYPH_HEIGHT * zoom_factor};
+  SDL_Rect dst = {.x = x, .y = y, .w = GLYPH_WIDTH * zoom_factor, .h = GLYPH_HEIGHT * zoom_factor};
 
   size_t index = 63;
   if ((glyph >= 'a' && glyph <= 'z') || (glyph >= 'A' && glyph <= 'Z')) {
@@ -341,30 +342,49 @@ void render_text(SDL_Renderer* renderer, char* glyphs, int32_t x, int32_t y, uin
   }
 }
 
-void render_deck(SDL_Renderer* renderer, Player* player, uint32_t x, uint32_t y, int selected_card) {
-  uint32_t sx = x - (CARD_WIDTH + DECK_PADDING) * zoom_factor * player->n_cards / 2 + DECK_PADDING * zoom_factor / 2;
+void render_deck(
+  SDL_Renderer* renderer,
+  Player* player,
+  uint32_t x,
+  uint32_t y,
+  int selected_card) {
+  uint32_t sx = x - (CARD_WIDTH + DECK_PADDING) * zoom_factor * player->n_cards / 2
+                + DECK_PADDING * zoom_factor / 2;
   for (size_t n = 0; n < player->n_cards; n++) {
     SDL_Rect dst_rect = {
       .x = sx + (CARD_WIDTH + DECK_PADDING) * n * zoom_factor,
       .y = y + DECK_PADDING * zoom_factor,
       .w = CARD_WIDTH * zoom_factor,
-      .h = CARD_HEIGHT * zoom_factor
-    };
-    render_card(renderer, player->cards[n].type, player->cards[n].value - 7, selected_card == n, &dst_rect);
+      .h = CARD_HEIGHT * zoom_factor};
+    render_card(
+      renderer,
+      player->cards[n].type,
+      player->cards[n].value - 7,
+      selected_card == n,
+      &dst_rect);
   }
 }
 
-int get_hovered_card(Player* player, uint32_t deck_x, uint32_t deck_y, int32_t mouse_x, int32_t mouse_y) {
-  uint32_t sx = deck_x - (CARD_WIDTH + DECK_PADDING) * zoom_factor * player->n_cards / 2 + DECK_PADDING * zoom_factor / 2;
-  uint32_t ex = deck_x + (CARD_WIDTH + DECK_PADDING) * zoom_factor * player->n_cards / 2 - DECK_PADDING * zoom_factor / 2;
+int get_hovered_card(
+  Player* player,
+  uint32_t deck_x,
+  uint32_t deck_y,
+  int32_t mouse_x,
+  int32_t mouse_y) {
+  uint32_t sx = deck_x - (CARD_WIDTH + DECK_PADDING) * zoom_factor * player->n_cards / 2
+                + DECK_PADDING * zoom_factor / 2;
+  uint32_t ex = deck_x + (CARD_WIDTH + DECK_PADDING) * zoom_factor * player->n_cards / 2
+                - DECK_PADDING * zoom_factor / 2;
   if (mouse_x < sx) return -1;
   if (mouse_x > ex) return -1;
-  if (mouse_y < deck_y + DECK_PADDING * zoom_factor || mouse_y > deck_y + (CARD_HEIGHT + DECK_PADDING) * zoom_factor) return -1;
+  if (
+    mouse_y < deck_y + DECK_PADDING * zoom_factor
+    || mouse_y > deck_y + (CARD_HEIGHT + DECK_PADDING) * zoom_factor)
+    return -1;
   for (size_t n = 0; n < player->n_cards; n++) {
     if (
-      mouse_x >= sx + (CARD_WIDTH + DECK_PADDING) * n * zoom_factor &&
-      mouse_x <= sx + (CARD_WIDTH + DECK_PADDING) * n * zoom_factor + CARD_WIDTH * zoom_factor
-    ) {
+      mouse_x >= sx + (CARD_WIDTH + DECK_PADDING) * n * zoom_factor
+      && mouse_x <= sx + (CARD_WIDTH + DECK_PADDING) * n * zoom_factor + CARD_WIDTH * zoom_factor) {
       return n;
     }
   }
@@ -376,11 +396,12 @@ void render_round(SDL_Renderer* renderer, Game* game, size_t offset, uint32_t x,
 #define SELECT(a, b, c, d) (n < 2 ? (n == 0 ? (a) : (b)) : (n == 2 ? (c) : (d)))
     size_t pos = (n + 4 - offset) % 4;
     SDL_Rect dst_rect = {
-      .x = x + SELECT(CARD_WIDTH, 0, CARD_WIDTH, CARD_WIDTH * 2) * zoom_factor,
-      .y = y + SELECT(CARD_HEIGHT * 2, CARD_HEIGHT, 0, CARD_HEIGHT) * zoom_factor,
+      .x = x + SELECT(CARD_WIDTH, 0, CARD_WIDTH, CARD_WIDTH * 2) * zoom_factor
+           - (int)(1.5 * CARD_WIDTH * zoom_factor),
+      .y = y + SELECT(CARD_HEIGHT * 2, CARD_HEIGHT, 0, CARD_HEIGHT) * zoom_factor
+           - (int)(1.5 * CARD_HEIGHT * zoom_factor),
       .w = CARD_WIDTH * zoom_factor,
-      .h = CARD_HEIGHT * zoom_factor
-    };
+      .h = CARD_HEIGHT * zoom_factor};
     render_card(renderer, game->pli[pos].type, game->pli[pos].value - 7, 0, &dst_rect);
   }
 }
@@ -391,8 +412,12 @@ void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y) 
       .x = x + CARD_WIDTH * (n % 4) * zoom_factor / 2,
       .y = y + CARD_HEIGHT * (n / 4) * zoom_factor / 2,
       .w = CARD_WIDTH * zoom_factor / 2,
-      .h = CARD_HEIGHT * zoom_factor / 2
-    };
-    render_card(renderer, n < ai->n_cards ? ai->cards[n].type : VOIDCARD, ai->cards[n].value - 7, !(ai->cards_revealed & (1 << n)) * 2, &dst_rect);
+      .h = CARD_HEIGHT * zoom_factor / 2};
+    render_card(
+      renderer,
+      n < ai->n_cards ? ai->cards[n].type : VOIDCARD,
+      ai->cards[n].value - 7,
+      !(ai->cards_revealed & (1 << n)) * 2,
+      &dst_rect);
   }
 }

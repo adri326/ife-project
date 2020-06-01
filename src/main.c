@@ -27,7 +27,13 @@
 
 void display_test(void);
 void render_card_test(SDL_Renderer* renderer, uint8_t state);
-void render_deck_test(SDL_Renderer* renderer, Player* player, uint32_t x, uint32_t y, int32_t mouse_x, int32_t mouse_y);
+void render_deck_test(
+  SDL_Renderer* renderer,
+  Player* player,
+  uint32_t x,
+  uint32_t y,
+  int32_t mouse_x,
+  int32_t mouse_y);
 void render_round_test(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y);
 void render_ai_deck_test(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y);
 
@@ -63,7 +69,7 @@ void display_test() {
   if (!init_textures(renderer, 4)) { printf("Uh oh! %s\n", SDL_GetError()); }
 
   bool exit = false;
-  uint8_t state = 0;
+  // uint8_t state = 0;
   int32_t mouse_x = 0;
   int32_t mouse_y = 0;
 
@@ -77,9 +83,7 @@ void display_test() {
       {.type = HEARTS, .value = 11},
       {.type = TILES, .value = 12},
       {.type = CLOVERS, .value = 13},
-      {.type = SPIKES, .value = 14}
-    }
-  };
+      {.type = SPIKES, .value = 14}}};
 
   Player computer1 = {
     .cards_revealed = 0b00011100,
@@ -92,9 +96,7 @@ void display_test() {
       {.type = CLOVERS, .value = 9},
       {.type = TILES, .value = 12},
       {.type = CLOVERS, .value = 13},
-      {.type = SPIKES, .value = 14}
-    }
-  };
+      {.type = SPIKES, .value = 14}}};
 
   Player computer2 = {
     .cards_revealed = 0,
@@ -107,9 +109,7 @@ void display_test() {
       {.type = CLOVERS, .value = 9},
       {.type = TILES, .value = 12},
       {.type = CLOVERS, .value = 13},
-      {.type = SPIKES, .value = 14}
-    }
-  };
+      {.type = SPIKES, .value = 14}}};
 
   Player computer3 = {
     .cards_revealed = 0,
@@ -122,13 +122,14 @@ void display_test() {
       {.type = CLOVERS, .value = 9},
       {.type = TILES, .value = 12},
       {.type = CLOVERS, .value = 13},
-      {.type = SPIKES, .value = 14}
-    }
-  };
+      {.type = SPIKES, .value = 14}}};
 
   Game game = {
-    .pli = {{.type = HEARTS, .value = 7}, {.type = TILES, .value = 11}, {.type = VOIDCARD}, {.type = VOIDCARD}}
-  };
+    .pli = {
+      {.type = HEARTS, .value = 7},
+      {.type = TILES, .value = 11},
+      {.type = VOIDCARD},
+      {.type = VOIDCARD}}};
 
   while (!exit) {
     SDL_Event event;
@@ -140,16 +141,16 @@ void display_test() {
             exit = true;
             break;
           case SDLK_1:
-            state = 0;
+            // state = 0;
             break;
           case SDLK_2:
-            state = 1;
+            // state = 1;
             break;
           case SDLK_3:
-            state = 2;
+            // state = 2;
             break;
           case SDLK_4:
-            state = 3;
+            // state = 3;
             break;
         }
       } else if (event.type == SDL_QUIT) {
@@ -164,8 +165,14 @@ void display_test() {
     SDL_RenderClear(renderer);
 
     // render_card_test(renderer, state);
-    render_deck_test(renderer, &player, WIDTH / 2, HEIGHT - (CARD_HEIGHT + DECK_PADDING) * 4, mouse_x, mouse_y);
-    render_round_test(renderer, &game, WIDTH / 2 - CARD_WIDTH * 6, HEIGHT / 2 - CARD_HEIGHT * 6);
+    render_deck_test(
+      renderer,
+      &player,
+      WIDTH / 2,
+      HEIGHT - (CARD_HEIGHT + DECK_PADDING) * 4,
+      mouse_x,
+      mouse_y);
+    render_round_test(renderer, &game, WIDTH / 2, HEIGHT / 2);
     render_ai_deck_test(renderer, &computer1, 0, HEIGHT / 2 - CARD_HEIGHT * 2);
     render_ai_deck_test(renderer, &computer2, WIDTH / 2 - CARD_WIDTH * 4, 0);
     render_ai_deck_test(renderer, &computer3, WIDTH - CARD_WIDTH * 8, HEIGHT / 2 - CARD_HEIGHT * 2);
@@ -190,7 +197,13 @@ void render_card_test(SDL_Renderer* renderer, uint8_t state) {
   // render_text(renderer, "Hello, world!", 4, 4, 0);
 }
 
-void render_deck_test(SDL_Renderer* renderer, Player* player, uint32_t x, uint32_t y, int32_t mouse_x, int32_t mouse_y) {
+void render_deck_test(
+  SDL_Renderer* renderer,
+  Player* player,
+  uint32_t x,
+  uint32_t y,
+  int32_t mouse_x,
+  int32_t mouse_y) {
   render_deck(renderer, player, x, y, get_hovered_card(player, x, y, mouse_x, mouse_y));
 }
 

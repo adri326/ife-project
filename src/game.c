@@ -1,6 +1,6 @@
-#include <stdlib.h>
 #include "game.h"
 #include "ai.h"
+#include <stdlib.h>
 
 #ifdef TEST_ENV
 
@@ -11,9 +11,7 @@ bool players_turn(Game* game) {
       play_card(game, 0, n);
       break;
     }
-    if (n == player->n_cards - 1) {
-      ASSERT_MSG(false, "No card could be played!");
-    }
+    if (n == player->n_cards - 1) ASSERT_MSG(false, "No card could be played!");
   }
 
   return true;
@@ -37,7 +35,13 @@ void play_card(Game* game, size_t player_index, size_t card_index) {
   Player* player = &game->players[player_index];
 
 #ifdef TEST_ENV
-  if (card_index >= player->n_cards) ASSERT_MSG(false, "Card index is out of bound (%zu >= %" PRIu8 ")", card_index, player->n_cards);
+  if (card_index >= player->n_cards) {
+    ASSERT_MSG(
+      false,
+      "Card index is out of bound (%zu >= %" PRIu8 ")",
+      card_index,
+      player->n_cards);
+  }
 #else
   if (card_index >= player->n_cards) return;
 #endif

@@ -4,13 +4,17 @@ Language: Cpp
 
 PointerAlignment: Left
 AlignAfterOpenBracket: AlwaysBreak
-AlignOperands: false
+AlignOperands: true
 AlignTrailingComments: false
 BinPackArguments: false
 BinPackParameters: false
 ContinuationIndentWidth: 2
 IndentCaseLabels: true
 BreakBeforeBinaryOperators: NonAssignment
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+ReflowComments: false
+SortIncludes: false
 AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: false
 # AllowShortEnumsOnASingleLine: false
