@@ -29,6 +29,7 @@ typedef struct Card Card;
 
 struct Player {
   Card cards[8];
+  uint8_t cards_revealed; // bitmap of the cards that were revealed before the first round
   uint8_t n_cards; // number of cards currently held
   int trick_points_total; // variable enabling a count of the points won each
                           // trick rather than having to stock all the cards won

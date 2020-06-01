@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "game.h"
+#include "ai.h"
 
 #ifdef TEST_ENV
 
@@ -58,4 +59,25 @@ void play_card(Game* game, size_t player_index, size_t card_index) {
   }
 
   player->n_cards--;
+}
+
+bool game_turn(Game* game) {
+  uint8_t played_mask = 0b0000;
+  int current_player = game->trick_leader_position;
+  if (current_player < 0 || current_player >= 4) current_player = 0; // default to 0
+
+  // Empty `pli`
+  for (size_t n = 0; n < 4; n++) {
+    game->pli[n].type = VOIDCARD;
+  }
+
+  for (; played_mask < 0b1111; current_player = (current_player + 1) % 4) {
+    played_mask |= 1 << current_player;
+    if (current_player == 0) {
+      if (!players_turn(game)) return false;
+    } else {
+      ai_turn(game, (size_t)current_player);
+    }
+  }
+  return true;
 }

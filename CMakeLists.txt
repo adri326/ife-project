@@ -65,6 +65,8 @@ add_executable(
   src/rules.h
   src/game.c
   src/game.h
+  src/ai.c
+  src/ai.h
 )
 
 set(NO_TEST_DEPTH "false" CACHE STRING "true or false")

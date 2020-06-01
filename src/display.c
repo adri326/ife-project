@@ -222,7 +222,7 @@ SDL_Rect get_card_rect() {
 
 void render_card(SDL_Renderer* renderer, CardColor color, uint8_t number, uint8_t state, SDL_Rect* dst) {
   SDL_Rect outline_src = {
-    .x = card_rect.w * state,
+    .x = color == VOIDCARD ? card_rect.w * 4 : card_rect.w * state,
     .y = 0,
     .w = card_rect.w,
     .h = card_rect.h
@@ -230,7 +230,7 @@ void render_card(SDL_Renderer* renderer, CardColor color, uint8_t number, uint8_
   SDL_Rect card_src = get_card_rect();
 
   SDL_RenderCopy(renderer, outlines, &outline_src, dst);
-  if (state < 2) SDL_RenderCopy(renderer, get_texture(color, number), &card_src, dst);
+  if (state < 2 && color != VOIDCARD) SDL_RenderCopy(renderer, get_texture(color, number), &card_src, dst);
 }
 
 void colorize_glyph(SDL_Surface* glyph, uint32_t color) {
@@ -369,4 +369,30 @@ int get_hovered_card(Player* player, uint32_t deck_x, uint32_t deck_y, int32_t m
     }
   }
   return -1;
+}
+
+void render_round(SDL_Renderer* renderer, Game* game, size_t offset, uint32_t x, uint32_t y) {
+  for (size_t n = 0; n < 4; n++) {
+#define SELECT(a, b, c, d) (n < 2 ? (n == 0 ? (a) : (b)) : (n == 2 ? (c) : (d)))
+    size_t pos = (n + 4 - offset) % 4;
+    SDL_Rect dst_rect = {
+      .x = x + SELECT(CARD_WIDTH, 0, CARD_WIDTH, CARD_WIDTH * 2) * zoom_factor,
+      .y = y + SELECT(CARD_HEIGHT * 2, CARD_HEIGHT, 0, CARD_HEIGHT) * zoom_factor,
+      .w = CARD_WIDTH * zoom_factor,
+      .h = CARD_HEIGHT * zoom_factor
+    };
+    render_card(renderer, game->pli[pos].type, game->pli[pos].value - 7, 0, &dst_rect);
+  }
+}
+
+void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y) {
+  for (size_t n = 0; n < 8; n++) {
+    SDL_Rect dst_rect = {
+      .x = x + CARD_WIDTH * (n % 4) * zoom_factor / 2,
+      .y = y + CARD_HEIGHT * (n / 4) * zoom_factor / 2,
+      .w = CARD_WIDTH * zoom_factor / 2,
+      .h = CARD_HEIGHT * zoom_factor / 2
+    };
+    render_card(renderer, n < ai->n_cards ? ai->cards[n].type : VOIDCARD, ai->cards[n].value - 7, !(ai->cards_revealed & (1 << n)) * 2, &dst_rect);
+  }
 }

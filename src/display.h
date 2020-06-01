@@ -119,4 +119,8 @@ void render_deck(SDL_Renderer* renderer, Player* player, uint32_t x, uint32_t y,
 
 int get_hovered_card(Player* player, uint32_t deck_x, uint32_t deck_y, int32_t mouse_x, int32_t mouse_y);
 
+void render_round(SDL_Renderer* renderer, Game* game, size_t offset, uint32_t x, uint32_t y);
+
+void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y);
+
 #endif // DISPLAY_H

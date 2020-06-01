@@ -18,4 +18,10 @@ bool players_turn(Game* game);
 **/
 void play_card(Game* game, size_t player_index, size_t card_index);
 
+/** Plays a game's turn. Updates scores and calls both `ia_turn` and `players_turn`.
+* @param game - The current game
+* @returns true if the game should go on, false if the game should be halted
+**/
+bool game_turn(Game* game);
+
 #endif // GAME_H
