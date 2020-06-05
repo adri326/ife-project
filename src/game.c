@@ -47,15 +47,14 @@ void play_card(Game* game, size_t player_index, size_t card_index) {
 #endif
 
   // Append the card to the current turn, if possible
-  for (size_t n = 0; n < 4; n++) {
-    if (game->pli[n].type == VOIDCARD) {
-      game->pli[n] = player->cards[card_index];
-      break;
-    }
-#ifdef TEST_ENV
-    if (n == 3) ASSERT_MSG(false, "No more space left for player %zu's card!", player_index);
-#endif
+  if (game->pli[player_index].type == VOIDCARD) {
+    game->pli[player_index] = player->cards[card_index];
   }
+#ifdef TEST_ENV
+  else ASSERT_MSG(false, "No more space left for player %zu's card!", player_index);
+#else
+  else return;
+#endif
 
   // Shift the player's cards by one
   for (size_t n = card_index; n < player->n_cards - 1; n++) {

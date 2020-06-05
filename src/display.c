@@ -394,7 +394,6 @@ int get_hovered_card(
 void render_round(SDL_Renderer* renderer, Game* game, size_t offset, uint32_t x, uint32_t y) {
   for (size_t n = 0; n < 4; n++) {
 #define SELECT(a, b, c, d) (n < 2 ? (n == 0 ? (a) : (b)) : (n == 2 ? (c) : (d)))
-    size_t pos = (n + 4 - offset) % 4;
     SDL_Rect dst_rect = {
       .x = x + SELECT(CARD_WIDTH, 0, CARD_WIDTH, CARD_WIDTH * 2) * zoom_factor
            - (int)(1.5 * CARD_WIDTH * zoom_factor),
@@ -402,7 +401,7 @@ void render_round(SDL_Renderer* renderer, Game* game, size_t offset, uint32_t x,
            - (int)(1.5 * CARD_HEIGHT * zoom_factor),
       .w = CARD_WIDTH * zoom_factor,
       .h = CARD_HEIGHT * zoom_factor};
-    render_card(renderer, game->pli[pos].type, game->pli[pos].value - 7, 0, &dst_rect);
+    render_card(renderer, game->pli[n].type, game->pli[n].value - 7, 0, &dst_rect);
   }
 }
 

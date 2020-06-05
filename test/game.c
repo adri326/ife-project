@@ -25,12 +25,12 @@ BEGIN_TEST(play_card) {
   };
   Game game = {
     .players = {player_1, player_2, player_3, player_4},
-    .pli = {{.type = CLOVERS, .value = 7}, {.type = CLOVERS, .value = 8}, {.type = CLOVERS, .value = 9}, {.type = VOIDCARD}}
+    .pli = {{.type = VOIDCARD}, {.type = CLOVERS, .value = 7}, {.type = CLOVERS, .value = 8}, {.type = CLOVERS, .value = 9}}
   };
   play_card(&game, 0, 0);
   ASSERT_EQ_PRI(1, game.players[0].n_cards, "%d");
   ASSERT_EQ_PRI(11, game.players[0].cards[0].value, "%d");
-  ASSERT_EQ_PRI(HEARTS, game.pli[3].type, "%d");
-  ASSERT_EQ_PRI(7, game.pli[3].value, "%d");
+  ASSERT_EQ_PRI(HEARTS, game.pli[0].type, "%d");
+  ASSERT_EQ_PRI(7, game.pli[0].value, "%d");
 }
 END_TEST()

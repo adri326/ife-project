@@ -126,9 +126,9 @@ void display_test() {
 
   Game game = {
     .pli = {
+      {.type = VOIDCARD},
       {.type = HEARTS, .value = 7},
       {.type = TILES, .value = 11},
-      {.type = VOIDCARD},
       {.type = VOIDCARD}}};
 
   while (!exit) {
