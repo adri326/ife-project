@@ -6,7 +6,8 @@ BEGIN_TEST(rules) {
   EXECUTE_TEST(contract_check, "Test the contract_check() function");
   EXECUTE_TEST(card_value, "Test that card_value() returns the right card value");
   EXECUTE_TEST(trick_points, "Test that trick_points() returns the sum of 4 card_value()");
-  EXECUTE_TEST(trump_equality, "Check that the equality between CardType and TrumpColor is valid")
+  EXECUTE_TEST(trump_equality, "Check that the equality between CardType and TrumpColor is valid");
+  EXECUTE_TEST(move_check, "Test that move_check() lets you play the right cards");
 }
 END_TEST()
 
@@ -374,9 +375,36 @@ END_TEST()
 
 BEGIN_TEST(trump_equality) {
   ASSERT_EQ_MSG((int)HEARTS, (int)TRUMP_HEARTS, "HEARTS == TRUMP_HEARTS");
-  ASSERT_EQ_MSG((int)CLOVERS, (int)TRUMP_CLOVERS, "HEARTS == TRUMP_HEARTS");
-  ASSERT_EQ_MSG((int)TILES, (int)TRUMP_TILES, "HEARTS == TRUMP_HEARTS");
-  ASSERT_EQ_MSG((int)SPIKES, (int)TRUMP_SPIKES, "HEARTS == TRUMP_HEARTS");
+  ASSERT_EQ_MSG((int)TILES, (int)TRUMP_TILES, "TILES == TRUMP_TILES");
+  ASSERT_EQ_MSG((int)CLOVERS, (int)TRUMP_CLOVERS, "CLOVERS == TRUMP_CLOVERS");
+  ASSERT_EQ_MSG((int)SPIKES, (int)TRUMP_SPIKES, "SPIKES == TRUMP_SPIKES");
+  ASSERT_EQ_MSG((int)HEARTS, 0, "HEARTS == 0");
+  ASSERT_EQ_MSG((int)TILES, 1, "TILES == 1");
+  ASSERT_EQ_MSG((int)CLOVERS, 2, "CLOVERS == 2");
+  ASSERT_EQ_MSG((int)SPIKES, 3, "SPIKES == 3");
+}
+END_TEST()
+
+BEGIN_TEST(move_check) {
+  for (TrumpColor trump = 0; trump < 6; trump++) {
+    Game game = {.active_trump = trump, .trick_cut = false, .trick_leader_position = 0};
+    for (size_t n = 0; n < 4; n++) {
+      game.pli[n].type = VOIDCARD;
+    }
+    for (CardColor color = 0; color < 4; color++) {
+      for (uint8_t value = 7; value < 15; value++) {
+        Card card = {
+          .type = color,
+          .value = value
+        };
+        ASSERT_MSG(
+          move_check(game, card, 0, &game.trick_cut, game.trick_leader_position),
+          "Expected card (%d, %d) to be playable as the first player, no matter what!",
+          color,
+          value);
+      }
+    }
+  }
 }
 END_TEST()
 

@@ -1,4 +1,6 @@
 #include "rules.h"
+#include <stdlib.h>
+#include <stdbool.h>
 
 // TODO: dedupe
 // TODO: more verbose argument naming?
@@ -267,6 +269,16 @@ int card_value(Card card, Game game) {
 int move_check(Game game, Card card, int position, int* cut, int leader_position) {
   int check = 1; // will be used for the for statements
   Player* player = &game.players[position];
+
+  bool was_anything_played = false;
+  for (size_t n = 0; n < 4; n++) {
+    if (game.pli[n].type != VOIDCARD) {
+      was_anything_played = true;
+      break;
+    }
+  }
+  if (!was_anything_played) return 1;
+
   if (game.active_trump == ALLTRUMP || game.active_trump == NOTRUMP) { // no cut possible
     if (card.type == game.trick_colour) {
       return 1; // easiest case, everything is good
