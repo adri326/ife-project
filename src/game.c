@@ -13,7 +13,7 @@
 bool players_turn(Game* game) {
   Player* player = &game->players[0];
   for (size_t n = 0; n < player->n_cards; n++) {
-    if (move_check(*game, player->cards[n], 0, &game->trick_cut, game->trick_leader_position)) {
+    if (move_check(game, player->cards[n], 0)) {
       play_card(game, 0, n);
       break;
     }
@@ -62,7 +62,7 @@ bool players_turn(Game* game) {
         mouse_x = event.motion.x;
         mouse_y = event.motion.y;
         hovered_card = get_hovered_card(&game->players[0], deck_x, deck_y, mouse_x, mouse_y);
-        if (hovered_card != -1 && !move_check(*game, game->players[0].cards[hovered_card], 0, &game->trick_cut, game->trick_leader_position)) {
+        if (hovered_card != -1 && !move_check(game, game->players[0].cards[hovered_card], 0)) {
           hovered_card = -1;
         }
       } else if (event.type == SDL_MOUSEBUTTONDOWN) { // Mouse pressed: play card if possible

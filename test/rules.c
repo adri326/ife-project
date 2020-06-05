@@ -398,7 +398,7 @@ BEGIN_TEST(move_check) {
           .value = value
         };
         ASSERT_MSG(
-          move_check(game, card, 0, &game.trick_cut, game.trick_leader_position),
+          move_check(&game, card, 0),
           "Expected card (%d, %d) to be playable as the first player, no matter what!",
           color,
           value);
