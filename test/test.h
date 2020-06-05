@@ -14,7 +14,9 @@ extern size_t TEST_DEPTH;
 #endif
 #endif
 
+#ifndef TEST_ENV
 #define TEST_ENV
+#endif
 
 /** Prints where the assert errored out **/
 #ifdef __LINE__

@@ -65,6 +65,8 @@ add_executable(
   src/rules.h
   src/game.c
   src/game.h
+  src/ai.c
+  src/ai.h
 )
 
 set(NO_TEST_DEPTH "false" CACHE STRING "true or false")
@@ -75,6 +77,8 @@ if(NO_TEST_DEPTH STREQUAL "true")
 else()
   message("TEST_DEPTH enabled. Disable with -DNO_TEST_DEPTH=true if you experience issues with global variables in the test files")
 endif()
+
+target_compile_definitions(ife-project-test PUBLIC TEST_ENV)
 
 if(NOT MSVC)
   target_compile_options(ife-project-test BEFORE PUBLIC "SHELL:-Wno-unused-variable")
