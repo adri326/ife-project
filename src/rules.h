@@ -140,6 +140,8 @@ ally is leading the trick, we need to have the position of the trick leader.
 */
 int move_check(Game game, Card card, int position, int* cut, int leader_position);
 
+// TODO: make it use Game*
+
 /**
 We now need a function that determines, if the move was possible, who
 is leading after the move. It will return the position of the leader by

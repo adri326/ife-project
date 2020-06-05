@@ -24,4 +24,15 @@ void play_card(Game* game, size_t player_index, size_t card_index);
 **/
 bool game_turn(Game* game);
 
+/** Updates the scores of the game.
+* @param game - The current game
+**/
+void update_scores(Game* game);
+
+/** Plays out a game. Scores will be incrementally updated as `game_turn` is called.
+* @param game - The current game
+* @returns true if the game went on, false if the game halted
+**/
+bool play_all_turns(Game* game, size_t first_player_index);
+
 #endif // GAME_H

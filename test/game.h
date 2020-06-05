@@ -7,5 +7,6 @@
 DECL_TEST(play_card)
 
 DECL_TEST(game)
+DECL_TEST(game_turn)
 
 #endif // TEST_GAME_H

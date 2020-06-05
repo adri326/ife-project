@@ -78,6 +78,8 @@ else()
   message("TEST_DEPTH enabled. Disable with -DNO_TEST_DEPTH=true if you experience issues with global variables in the test files")
 endif()
 
+target_compile_definitions(ife-project-test PUBLIC TEST_ENV)
+
 if(NOT MSVC)
   target_compile_options(ife-project-test BEFORE PUBLIC "SHELL:-Wno-unused-variable")
 endif()
