@@ -55,7 +55,7 @@ static SDL_Texture* outlines = NULL;
 static SDL_Texture* cards[4][8];
 static SDL_Rect card_rect;
 static SDL_Texture* glyphs[16][8][8];
-static uint32_t zoom_factor;
+extern uint32_t zoom_factor;
 
 bool init_textures(SDL_Renderer* renderer, uint32_t factor) {
   SDL_Surface* outlines_raw = IMG_Load(RESOURCES_DIR "card_outlines.png");
@@ -391,7 +391,7 @@ int get_hovered_card(
   return -1;
 }
 
-void render_round(SDL_Renderer* renderer, Game* game, size_t offset, uint32_t x, uint32_t y) {
+void render_round(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y) {
   for (size_t n = 0; n < 4; n++) {
 #define SELECT(a, b, c, d) (n < 2 ? (n == 0 ? (a) : (b)) : (n == 2 ? (c) : (d)))
     SDL_Rect dst_rect = {
@@ -419,4 +419,26 @@ void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y) 
       !(ai->cards_revealed & (1 << n)) * 2,
       &dst_rect);
   }
+}
+
+extern uint32_t window_width;
+extern uint32_t window_height;
+
+void render_all(SDL_Renderer* renderer, Game* game, int hovered_card) {
+  SDL_SetRenderDrawColor(renderer, BG_RED, BG_GREEN, BG_BLUE, SDL_ALPHA_OPAQUE);
+  SDL_RenderClear(renderer);
+
+  uint32_t deck_x = window_width / 2;
+  uint32_t deck_y = window_height - (CARD_HEIGHT + DECK_PADDING) * 4;
+
+  render_deck(
+      renderer,
+      &game->players[0],
+      deck_x,
+      deck_y,
+      hovered_card);
+  render_round(renderer, game, window_width / 2, window_height / 2);
+  render_ai_deck(renderer, &game->players[1], 0, window_height / 2 - CARD_HEIGHT * 2);
+  render_ai_deck(renderer, &game->players[2], window_width / 2 - CARD_WIDTH * 4, 0);
+  render_ai_deck(renderer, &game->players[3], window_width - CARD_WIDTH * 8, window_height / 2 - CARD_HEIGHT * 2);
 }

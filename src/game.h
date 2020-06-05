@@ -5,6 +5,20 @@
 #include <stdbool.h>
 #include "rules.h"
 
+#ifdef _WIN32
+#define IS_WIN
+#endif
+#ifdef _WIN64
+#define IS_WIN
+#endif
+#ifdef IS_WIN
+#include <windows.h>
+#define SLEEP(x) SleepEx(x, true)
+#else
+#include <unistd.h>
+#define SLEEP(x) usleep(x * 1000)
+#endif
+
 /** Placeholder function to determine which card the player wishes to play. Modifies `game`.
 * @param game - The current game
 * @returns true if the game should go on, false if the game should be halted

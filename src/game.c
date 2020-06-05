@@ -3,6 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef TEST_ENV
+#include "display.h"
+#endif
+
 #ifdef TEST_ENV
 #include "../test/test.h"
 
@@ -25,8 +29,57 @@ bool players_turn(Game* game) {
 
 #else
 
+extern SDL_Renderer* renderer;
+extern uint32_t window_width;
+extern uint32_t window_height;
+
 bool players_turn(Game* game) {
-  return false; // TODO
+  int32_t mouse_x = 0;
+  int32_t mouse_y = 0;
+  bool exit = false;
+
+  uint32_t deck_x = window_width / 2;
+  uint32_t deck_y = window_height - (CARD_HEIGHT + DECK_PADDING) * 4;
+
+  int hovered_card = -1;
+
+  // Display loop
+  while (!exit) {
+    SDL_Event event;
+    SLEEP(50);
+
+    // Poll events
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_KEYUP) { // Key pressed
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
+            exit = true;
+            break;
+        }
+      } else if (event.type == SDL_QUIT) { // Window closed
+        exit = true;
+      } else if (event.type == SDL_MOUSEMOTION) { // Mouse moved: update hovered_card
+        mouse_x = event.motion.x;
+        mouse_y = event.motion.y;
+        hovered_card = get_hovered_card(&game->players[0], deck_x, deck_y, mouse_x, mouse_y);
+        if (hovered_card != -1 && !move_check(*game, game->players[0].cards[hovered_card], 0, &game->trick_cut, game->trick_leader_position)) {
+          hovered_card = -1;
+        }
+      } else if (event.type == SDL_MOUSEBUTTONDOWN) { // Mouse pressed: play card if possible
+        if (hovered_card != -1) {
+          play_card(game, 0, (size_t)hovered_card);
+          return true;
+        }
+      }
+    }
+
+    // Render the current game state
+    render_all(renderer, game, hovered_card);
+
+    SDL_RenderPresent(renderer);
+  }
+
+  return false;
 }
 
 #endif

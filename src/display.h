@@ -29,6 +29,10 @@
 #define LINE_HEIGHT 7
 #define GLYPH_MARGIN 1
 
+#define BG_RED 189
+#define BG_GREEN 204
+#define BG_BLUE 210
+
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 #define RMASK 0xff000000
 #define GMASK 0x00ff0000
@@ -147,11 +151,10 @@ int get_hovered_card(
 /** Renders the cards at the center of the board
 * @param renderer - The current renderer
 * @param game - The current Game
-* @param offset - The round's offset (which player started the round)
 * @param x - Center of the board
 * @param y - Center of the board
 **/
-void render_round(SDL_Renderer* renderer, Game* game, size_t offset, uint32_t x, uint32_t y);
+void render_round(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y);
 
 /** Renders an opponent's deck
 * @param renderer - The current renderer
@@ -160,5 +163,12 @@ void render_round(SDL_Renderer* renderer, Game* game, size_t offset, uint32_t x,
 * @param y - The deck's top left corner's Y coordinate
 **/
 void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y);
+
+/** Calls render_deck, render_round, render_ai_deck and get_hovered_card. Does not update the view.
+* @param renderer - The current renderer
+* @param game - The current game
+* @param hovered_card - The card that should be highlighted
+**/
+void render_all(SDL_Renderer* renderer, Game* game, int hovered_card);
 
 #endif // DISPLAY_H

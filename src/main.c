@@ -1,6 +1,7 @@
 #include "ai.h"
 #include "display.h"
 #include "rules.h"
+#include "game.h"
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -11,31 +12,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#ifdef _WIN32
-#define IS_WIN
-#endif
-#ifdef _WIN64
-#define IS_WIN
-#endif
-#ifdef IS_WIN
-#include <windows.h>
-#define SLEEP(x) SleepEx(x, true)
-#else
-#include <unistd.h>
-#define SLEEP(x) usleep(x * 1000)
-#endif
+uint32_t zoom_factor;
+uint32_t window_width;
+uint32_t window_height;
+SDL_Renderer* renderer;
 
 void display_test(void);
-void render_card_test(SDL_Renderer* renderer, uint8_t state);
-void render_deck_test(
-  SDL_Renderer* renderer,
-  Player* player,
-  uint32_t x,
-  uint32_t y,
-  int32_t mouse_x,
-  int32_t mouse_y);
-void render_round_test(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y);
-void render_ai_deck_test(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y);
 
 int main(int argc, char* argv[]) {
   // Game game;
@@ -49,18 +31,19 @@ int main(int argc, char* argv[]) {
 
 void display_test() {
   SDL_Init(SDL_INIT_VIDEO);
-  uint32_t WIDTH = (CARD_WIDTH + 2) * 12 * 4;
-  const uint32_t HEIGHT = (CARD_HEIGHT + 2) * 8 * 4;
+  zoom_factor = 4;
+  window_width = (CARD_WIDTH + 2) * 12 * 4;
+  window_height = (CARD_HEIGHT + 2) * 8 * 4;
 
   SDL_Window* window = SDL_CreateWindow(
     "This needs a title",
     SDL_WINDOWPOS_UNDEFINED,
     SDL_WINDOWPOS_UNDEFINED,
-    WIDTH,
-    HEIGHT,
+    window_width,
+    window_height,
     0);
 
-  SDL_Renderer* renderer =
+  renderer =
     SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE); // TODO: use hardware renderer
   SDL_SetRenderDrawColor(renderer, 128, 128, 128, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
@@ -125,92 +108,17 @@ void display_test() {
       {.type = SPIKES, .value = 14}}};
 
   Game game = {
+    .players = {player, computer1, computer2, computer3},
     .pli = {
       {.type = VOIDCARD},
       {.type = HEARTS, .value = 7},
       {.type = TILES, .value = 11},
       {.type = VOIDCARD}}};
 
-  while (!exit) {
-    SDL_Event event;
-    SLEEP(50);
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_KEYUP) {
-        switch (event.key.keysym.sym) {
-          case SDLK_ESCAPE:
-            exit = true;
-            break;
-          case SDLK_1:
-            // state = 0;
-            break;
-          case SDLK_2:
-            // state = 1;
-            break;
-          case SDLK_3:
-            // state = 2;
-            break;
-          case SDLK_4:
-            // state = 3;
-            break;
-        }
-      } else if (event.type == SDL_QUIT) {
-        exit = true;
-      } else if (event.type == SDL_MOUSEMOTION) {
-        mouse_x = event.motion.x;
-        mouse_y = event.motion.y;
-      }
-    }
-
-    SDL_SetRenderDrawColor(renderer, 128, 128, 128, SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(renderer);
-
-    // render_card_test(renderer, state);
-    render_deck_test(
-      renderer,
-      &player,
-      WIDTH / 2,
-      HEIGHT - (CARD_HEIGHT + DECK_PADDING) * 4,
-      mouse_x,
-      mouse_y);
-    render_round_test(renderer, &game, WIDTH / 2, HEIGHT / 2);
-    render_ai_deck_test(renderer, &computer1, 0, HEIGHT / 2 - CARD_HEIGHT * 2);
-    render_ai_deck_test(renderer, &computer2, WIDTH / 2 - CARD_WIDTH * 4, 0);
-    render_ai_deck_test(renderer, &computer3, WIDTH - CARD_WIDTH * 8, HEIGHT / 2 - CARD_HEIGHT * 2);
-
-    SDL_RenderPresent(renderer);
-  }
+  ai_turn(&game, 3);
+  players_turn(&game);
 
   destroy_textures();
   SDL_DestroyWindow(window);
   SDL_Quit();
-}
-
-void render_card_test(SDL_Renderer* renderer, uint8_t state) {
-  for (CardColor color = 0; color < 4; color++) {
-    for (uint8_t num = 0; num < 8; num++) {
-      SDL_Rect dst_rect = get_card_rect();
-      dst_rect.x = num * (CARD_WIDTH + 2) * 4 + 1;
-      dst_rect.y = color * (CARD_HEIGHT + 2) * 4 + 1;
-      render_card(renderer, color, num, state, &dst_rect);
-    }
-  }
-  // render_text(renderer, "Hello, world!", 4, 4, 0);
-}
-
-void render_deck_test(
-  SDL_Renderer* renderer,
-  Player* player,
-  uint32_t x,
-  uint32_t y,
-  int32_t mouse_x,
-  int32_t mouse_y) {
-  render_deck(renderer, player, x, y, get_hovered_card(player, x, y, mouse_x, mouse_y));
-}
-
-void render_round_test(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y) {
-  render_round(renderer, game, 1, x, y);
-}
-
-void render_ai_deck_test(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y) {
-  render_ai_deck(renderer, ai, x, y);
 }
