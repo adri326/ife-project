@@ -398,7 +398,7 @@ int leader_trick(Game game, int position, int current_leader_position, int* cut)
               card_value(*player_card, game)
               < card_value(*leader_card, game)) { // a worst card is played
               return current_leader_position;
-            } else { // player and leader played 7 and 8 right color
+            } else { // player and leader played 7,8 or 9 of the right color
               if (player_card->value > leader_card->value) {
                 return position;
               } else {
