@@ -17,6 +17,10 @@ void ai_turn(Game* game, size_t player) {
            && i<25); //we limit the number of loops in case the ai
                      //does not have strong cards. It is faster than
                      //checking what cards were already checked each time.
+        while (game->players[player].cards[card_index].type==VOIDCARD)
+        { // we pick a card slot not empty
+            card_index=(card_index+1)%8;
+        }
         play_card(game, player, card_index);
     } else {
     play_card(game, player,
