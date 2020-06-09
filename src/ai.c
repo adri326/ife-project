@@ -2,8 +2,26 @@
 #include "game.h"
 
 void ai_turn(Game* game, size_t player) {
-  play_card(game, player,
+    srand(time(0));
+    if (game->pli[(player+1)%4].type==VOIDCARD
+        && game->pli[(player+2)%4].type==VOIDCARD
+        && game->pli[(player+3)%4].type==VOIDCARD)
+    { //if the AI is first to play, it will play a random strong card
+        size_t card_index;
+        int i=0;
+        do {
+            card_index = (int)rand()%8;
+            i=i+1;
+        } while (
+          card_value(game->players[player].cards[card_index], *game)==0
+           && i<25); //we limit the number of loops in case the ai
+                     //does not have strong cards. It is faster than
+                     //checking what cards were already checked each time.
+        play_card(game, player, card_index);
+    } else {
+    play_card(game, player,
     ai_card_played (game, player, ai_win (game, player)));
+    }
 }
 
 bool ai_win (Game* game, size_t player)
