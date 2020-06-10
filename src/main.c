@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 // Otherwise the linker errors out due to SDL2 redefining `main` by default
 #define SDL_MAIN_HANDLED
@@ -20,6 +21,7 @@ SDL_Renderer* renderer;
 void display_test(void);
 
 int main(int argc, char* argv[]) {
+  srand(time(0));
   // Game game;
   // Teams active_team; // variable that will help each time a function needs to
   //                    // know what team is concerned, e.g.: for the contracts
@@ -50,11 +52,6 @@ void display_test() {
   SDL_RenderPresent(renderer);
 
   if (!init_textures(renderer, 4)) { printf("Uh oh! %s\n", SDL_GetError()); }
-
-  bool exit = false;
-  // uint8_t state = 0;
-  int32_t mouse_x = 0;
-  int32_t mouse_y = 0;
 
   Player player = {
     .n_cards = 6,

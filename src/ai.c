@@ -2,7 +2,6 @@
 #include "game.h"
 
 void ai_turn(Game* game, size_t player) {
-    srand(time(0));
     if (game->pli[(player+1)%4].type==VOIDCARD
         && game->pli[(player+2)%4].type==VOIDCARD
         && game->pli[(player+3)%4].type==VOIDCARD)

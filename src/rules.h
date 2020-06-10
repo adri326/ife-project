@@ -136,21 +136,10 @@ int card_value(Card card, Game game);
 **/
 int move_check(Game* game, Card card, size_t player_index);
 
-// TODO: make it use Game*
-
-/**
-We now need a function that determines, if the move was possible, who
-is leading after the move. It will return the position of the leader by
-simply comparing the former leader's card to the last card played.
-Therefore this function will be called after each move.
-The first player to make a move during a trick will automatically
-be set as leader by the function. To do so, we need the general informations of game,
-the position of the last player to have made a move, and the current
-leader's position which will correspond to the variable trick_leader_position.
-If it is the first move of the trick, this variable won't matter.
-This same variable will then take the value returned by this function in the main.
-This function will also initialize the trick_cut variable on the first move of a trick.
-*/
-int leader_trick(Game game, int position, int current_leader_position, int* cut);
+/** Determines after a move was done who is leading the round
+* @param game - The current game, from which the leader's position will be extracted
+* @param player_index - The current player position
+**/
+int leader_trick(Game* game, size_t player_index);
 
 #endif // RULES_H

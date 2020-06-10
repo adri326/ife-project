@@ -337,80 +337,65 @@ int move_check(Game* game, Card card, size_t player_index) {
   }
 }
 
-int leader_trick(Game game, int position, int current_leader_position, int* cut) {
-  Card* card1 = &game.pli[(position + 1) % 4]; // to check either it is
-  Card* card2 = &game.pli[(position + 2) % 4]; // the first move of the trick
-  Card* card3 = &game.pli[(position + 3) % 4]; // or not
-  Card* player_card = &game.pli[position];
-  Card* leader_card = &game.pli[current_leader_position];
-  if (
-    card1->type == VOIDCARD && card2->type == VOIDCARD
-    && card3->type == VOIDCARD) { // it is the first move
-    if ((int)player_card->type == (int)game.active_trump) {
-      // we initialize the cut variable by determining if the trick color is the trump or not
-      *cut = 1;
-    } else {
-      *cut = 0;
+int leader_trick(Game* game, size_t player_index) {
+  int current_leader_position = game->trick_leader_position;
+  Card* card1 = &game->pli[(player_index + 1) % 4]; // to check either it is
+  Card* card2 = &game->pli[(player_index + 2) % 4]; // the first move of the trick
+  Card* card3 = &game->pli[(player_index + 3) % 4]; // or not
+  Card* player_card = &game->pli[player_index];
+  Card* leader_card = &game->pli[current_leader_position];
+
+  const int player_card_value = card_value(*player_card, *game);
+  const int leader_card_value = card_value(*leader_card, *game);
+
+  if (card1->type == VOIDCARD && card2->type == VOIDCARD && card3->type == VOIDCARD) {
+    // it is the first move
+    return player_index;
+  }
+
+  if (game->trick_cut) {
+    // the "best" color are changed if the trick was not cut
+    // trick was cut, we only have to check for trumps
+
+    if ((int)leader_card->type != (int)game->active_trump) {
+      // the leader hadn't cut, which means that the player just cut
+      return player_index;
     }
-    return position;
-  } else {
-    switch (game.trick_cut) // the "best" color are changed if the trick was not cut
-    {
-      case 1: // trick was cut, we only have to check for trumps
-        if ((int)leader_card->type == (int)game.active_trump) { // leader played trump
-          if (
-            (int)player_card->type
-            == (int)game.active_trump) { // player played trump, we need to compare the values
-            if (
-              card_value(*player_card, game)
-              > card_value(*leader_card, game)) { // a better card is played
-              return position;
-            } else {
-              if (
-                card_value(*player_card, game)
-                < card_value(*leader_card, game)) { // a worst card is played
-                return current_leader_position;
-              } else { // player and leader played 7 and 8 trump
-                if (player_card->value > leader_card->value) {
-                  return position;
-                } else {
-                  return current_leader_position;
-                }
-              }
-            }
-          } else { // player didn't play trump, can't win against a trump
-            return current_leader_position;
-          }
-        } else { // leader didn't play trump, player cut
-          return position;
-        }
-        break;
-      case 0: // trick wasn't cut, leader has played the right color (the opposite is impossible here)
-        if (
-          player_card->type
-          == game.trick_color) { // player played the right color, we need to compare values
-          if (
-            card_value(*player_card, game)
-            > card_value(*leader_card, game)) { // a better card is played
-            return position;
-          } else {
-            if (
-              card_value(*player_card, game)
-              < card_value(*leader_card, game)) { // a worst card is played
-              return current_leader_position;
-            } else { // player and leader played 7,8 or 9 of the right color
-              if (player_card->value > leader_card->value) {
-                return position;
-              } else {
-                return current_leader_position;
-              }
-            }
-          }
-        } else { // can't win against the good color without cutting
-          return current_leader_position;
-        }
-        break;
+
+    if ((int)player_card->type != (int)game->active_trump) {
+      // player didn't play trump, can't win against a trump
+      return current_leader_position;
+    }
+
+    // both players played trump, we need to compare their card's value
+
+    if (player_card_value > leader_card_value) { // a better card is played
+      return player_index;
+    } else if (player_card_value < leader_card_value) { // a worst card is played
+      return current_leader_position;
+    } else if (player_card->value > leader_card->value) {
+      // player and leader played both a 7 or a 8
+      return player_index;
+    } else {
+      return current_leader_position;
+    }
+  } else { // trick wasn't cut, leader has played the right color (the opposite is impossible here)
+    if (player_card->type == game->trick_color) {
+      // player played the right color, we need to compare values
+      if (player_card_value > leader_card_value) { // a better card is played
+        return player_index;
+      } else if (player_card_value < leader_card_value) { // a worst card is played
+        return current_leader_position;
+      } else if (player_card->value > leader_card->value) {
+        // player and leader played 7,8 or 9 of the right color
+        return player_index;
+      } else {
+        return current_leader_position;
+      }
+    } else if ((int)player_card->type == (int)game->active_trump) {
+      return player_index;
+    } else { // can't win against the good color without cutting
+      return current_leader_position;
     }
   }
-  return -1; // TODO: explicit exhaustive branching
 }
