@@ -8,6 +8,7 @@ BEGIN_TEST(rules) {
   EXECUTE_TEST(trick_points, "Test that trick_points() returns the sum of 4 card_value()");
   EXECUTE_TEST(trump_equality, "Check that the equality between CardType and TrumpColor is valid");
   EXECUTE_TEST(move_check, "Test that move_check() lets you play the right cards");
+  EXECUTE_TEST(leader_trick, "Test that leader_trick() correctly returns which player is leading");
 }
 END_TEST()
 
@@ -402,6 +403,62 @@ BEGIN_TEST(move_check) {
           "Expected card (%d, %d) to be playable as the first player, no matter what!",
           color,
           value);
+      }
+    }
+  }
+}
+END_TEST()
+
+BEGIN_TEST(leader_trick) {
+  size_t order[8] = {7, 8, 9, 11, 12, 13, 10, 14};
+  for (TrumpColor trump = 0; trump < 4; trump++) {
+    for (uint8_t value = 0; value < 7; value++) {
+      {
+        Game game = {
+          .active_trump = (trump + 1) % 4,
+          .trick_cut = false,
+          .trick_leader_position = 0,
+          .trick_color = trump,
+          .pli = {{.type = trump, .value = order[value]}, {.type = trump, .value = order[value + 1]}}
+        };
+        ASSERT_EQ_MSG(1, leader_trick(&game, 1), "Expected player 1 to be the trick leader, got player 0. Trump(%d), CardValue(%zu // %zu)", (trump + 1) % 4, order[value], order[value + 1]);
+      }
+      {
+        Game game = {
+          .active_trump = (trump + 1) % 4,
+          .trick_cut = false,
+          .trick_leader_position = 0,
+          .trick_color = trump,
+          .pli = {{.type = trump, .value = order[value + 1]}, {.type = trump, .value = order[value]}}
+        };
+        ASSERT_EQ_MSG(0, leader_trick(&game, 1), "Expected player 0 to be the trick leader, got player 1. Trump(%d), CardValue(%zu // %zu)", (trump + 1) % 4, order[value + 1], order[value]);
+      }
+    }
+  }
+}
+{
+  size_t order[8] = {7, 8, 12, 13, 10, 14, 9, 11};
+  for (TrumpColor trump = 0; trump < 4; trump++) {
+    for (uint8_t value = 0; value < 7; value++) {
+      {
+        Game game = {
+          .active_trump = trump,
+          .trick_cut = false,
+          .trick_leader_position = 0,
+          .trick_color = trump,
+          .pli = {{.type = trump, .value = order[value]}, {.type = trump, .value = order[value + 1]}}
+        };
+        ASSERT_EQ_MSG(1, leader_trick(&game, 1), "Expected player 1 to be the trick leader, got player 0. Trump(%d), CardValue(%zu // %zu)", trump, order[value], order[value + 1]);
+      }
+      {
+        Game game = {
+          .active_trump = trump,
+          .trick_cut = false,
+          .trick_leader_position = 0,
+          .trick_color = trump,
+          .pli = {{.type = trump, .value = order[value + 1]}, {.type = trump, .value = order[value]}}
+        };
+        ASSERT_EQ_MSG(0, leader_trick(&game, 1), "Expected player 0 to be the trick leader, got player 1. Trump(%d), CardValue(%zu // %zu)", trump, order[value + 1], order[value]);
       }
     }
   }

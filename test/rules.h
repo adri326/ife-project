@@ -10,6 +10,7 @@ DECL_TEST(card_value)
 DECL_TEST(trick_points)
 DECL_TEST(trump_equality)
 DECL_TEST(move_check)
+DECL_TEST(leader_trick)
 
 DECL_TEST(rules)
 
