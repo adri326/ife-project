@@ -463,6 +463,35 @@ BEGIN_TEST(leader_trick) {
     }
   }
 }
+{
+  size_t order[8] = {7, 8, 9, 11, 12, 13, 10, 14};
+  for (TrumpColor trump = 0; trump < 4; trump++) {
+    for (uint8_t value = 0; value < 7; value++) {
+      {
+        Game game = {
+          .active_trump = (trump + 1) % 4,
+          .trick_cut = false,
+          .trick_leader_position = 0,
+          .trick_color = trump,
+          .pli = {{.type = trump, .value = order[value]}, {.type = (trump + 1) % 4, .value = 7}},
+          .trick_cut = true,
+        };
+        ASSERT_EQ_MSG(1, leader_trick(&game, 1), "Expected player 1 to be the trick leader, got player 0. Trump(%d), CardValue(%zu // %d)", (trump + 1) % 4, order[value], 7);
+      }
+      {
+        Game game = {
+          .active_trump = (trump + 1) % 4,
+          .trick_cut = false,
+          .trick_leader_position = 0,
+          .trick_color = (trump + 1) % 4,
+          .pli = {{.type = (trump + 1) % 4, .value = 7}, {.type = trump, .value = order[value]}},
+          .trick_cut = false,
+        };
+        ASSERT_EQ_MSG(0, leader_trick(&game, 1), "Expected player 0 to be the trick leader, got player 1. Trump(%d), CardValue(%d // %zu)", (trump + 1) % 4, 7, order[value]);
+      }
+    }
+  }
+}
 END_TEST()
 
 // TODO: all of the other cases
