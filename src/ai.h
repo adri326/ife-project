@@ -22,10 +22,4 @@ the lowest value card otherwise.
 */
 size_t ai_card_played (Game* game, size_t player, bool ai_can_win);
 
-/**
-To check if a card can win against the current best trick card.
-Very similar to leader_trick in rules.h with only a few changes to fit this situation.
-*/
-bool card_wins (Game* game, size_t player, int i);
-
 #endif // AI_H

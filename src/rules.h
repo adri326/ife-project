@@ -2,6 +2,7 @@
 #define RULES_H
 
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 // VOID represents an empty slot in order not to interfere with hand checks
@@ -141,5 +142,13 @@ int move_check(Game* game, Card card, size_t player_index);
 * @param player_index - The current player position
 **/
 int leader_trick(Game* game, size_t player_index);
+
+/**
+To check if a card can win against the current best trick card.
+Very similar to leader_trick in rules.h with only a few changes to fit this situation.
+* @param game - The current game, from which the leader's position will be extracted
+* @param card - The card to check against
+*/
+bool card_wins (Game* game, Card card, size_t player_index);
 
 #endif // RULES_H
