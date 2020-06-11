@@ -9,34 +9,36 @@ void ai_turn(Game* game, size_t player) {
     size_t card_index;
     int i = 0;
     do {
-      card_index = (int)rand() % 8;
+      card_index = (int)rand() % game->players[player].n_cards;
       i++;
       // we limit the number of loops in case the ai
       // does not have strong cards. It is faster than
       // checking what cards were already checked each time.
     } while (card_value(game->players[player].cards[card_index], *game) == 0 && i < 25);
-    while (game->players[player].cards[card_index].type
-           == VOIDCARD) { // we pick a card slot not empty
-      card_index = (card_index + 1) % 8;
-    }
+
     play_card(game, player, card_index);
   } else {
-    play_card(game, player, ai_card_played(game, player, ai_win(game, player)));
+    play_card(game, player, ai_choose_card(game, player));
   }
 }
 
-bool ai_win(Game* game, size_t player) {
+bool can_ai_win(Game* game, size_t player) {
   bool wins = false;
   for (int i = 0; i < 8; i++) {
-    if (card_wins(game, game->players[player].cards[i], player) == true) { wins = true; }
+    if (
+      move_check(game, game->players[player].cards[i], player)
+      && card_wins(game, game->players[player].cards[i], player)) {
+      wins = true;
+    }
   } // we check if any card in the hand can win
   return wins;
 }
 
-size_t ai_card_played(Game* game, size_t player, bool ai_can_win) {
+size_t ai_choose_card(Game* game, size_t player) {
+
   size_t card_index = 0;
   // depending on this, we choose a card by two possible ways:
-  if (ai_can_win) {
+  if (can_ai_win(game, player)) {
     // ai can win, we look for the lowest value card so that it does
     for (int i = 1; i < 8; i++) {
       if (

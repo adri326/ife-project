@@ -143,12 +143,10 @@ int move_check(Game* game, Card card, size_t player_index);
 **/
 int leader_trick(Game* game, size_t player_index);
 
-/**
-To check if a card can win against the current best trick card.
-Very similar to leader_trick in rules.h with only a few changes to fit this situation.
+/** To check if a card can win against the current trick's best card played.
 * @param game - The current game, from which the leader's position will be extracted
 * @param card - The card to check against
 */
-bool card_wins (Game* game, Card card, size_t player_index);
+bool card_wins(Game* game, Card card, size_t player_index);
 
 #endif // RULES_H
