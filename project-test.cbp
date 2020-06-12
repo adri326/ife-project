@@ -40,6 +40,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="test/game.h" />
+		<Unit filename="test/ai.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="test/ai.h" />
 		<Unit filename="test/test.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

@@ -61,6 +61,8 @@ add_executable(
   test/rules.h
   test/game.c
   test/game.h
+  test/ai.c
+  test/ai.h
   src/rules.c
   src/rules.h
   src/game.c

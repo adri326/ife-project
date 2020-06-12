@@ -283,7 +283,7 @@ int move_check(Game* game, Card card, size_t player_index) {
     if (card.type == game->trick_color) {
       return true; // easiest case, everything is good
     } else { // wrong color, we need to check the hand first
-      for (int i = 0; i < 8; i++) {
+      for (int i = 0; i < player->n_cards; i++) {
         if (player->cards[i].type == game->trick_color) { return 0; }
       }
       return 1;
@@ -296,7 +296,7 @@ int move_check(Game* game, Card card, size_t player_index) {
       } else {
         bool has_trump_card = true;
         // the player may only play another color if they cannot play a trump card (?)
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < player->n_cards; i++) {
           if ((int)player->cards[i].type == (int)game->active_trump) { has_trump_card = false; }
         }
         return has_trump_card;
@@ -306,11 +306,12 @@ int move_check(Game* game, Card card, size_t player_index) {
       if (card.type == game->trick_color) { // the player plays the right color, everything is ok
         return 1;
       } else {
-        bool has_trick_color = true;
+        bool has_trick_color = false;
         // the player may only play a card of the other color if they have no more cards of the trick color in their hand
-        for (int i = 0; i < 8; i++) {
-          if (player->cards[i].type == game->trick_color) { has_trick_color = false; }
+        for (int i = 0; i < player->n_cards; i++) {
+          if (player->cards[i].type == game->trick_color) { has_trick_color = true; }
         }
+
         if (has_trick_color) {
           return 0;
         } else { // the player doesn't have the right color
@@ -319,7 +320,7 @@ int move_check(Game* game, Card card, size_t player_index) {
           } else {
             // the player may play another color only if they cannot cut already
             bool can_cut = false;
-            for (int i = 0; i < 8; i++) { // no need to reset check, it is =1 in this case
+            for (int i = 0; i < player->n_cards; i++) { // no need to reset check, it is =1 in this case
               if ((int)player->cards[i].type == (int)game->active_trump) { can_cut = true; }
             }
             if (can_cut) {

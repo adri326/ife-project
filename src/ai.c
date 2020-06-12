@@ -26,7 +26,7 @@ void ai_turn(Game* game, size_t player) {
 
 bool can_ai_win(Game* game, size_t player) {
   bool wins = false;
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < game->players[player].n_cards; i++) {
     if (
       move_check(game, game->players[player].cards[i], player)
       && card_wins(game, game->players[player].cards[i], player)) {
