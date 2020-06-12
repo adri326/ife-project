@@ -17,8 +17,10 @@ void ai_turn(Game* game, size_t player) {
     } while (card_value(game->players[player].cards[card_index], *game) == 0 && i < 25);
 
     play_card(game, player, card_index);
+  } else if (can_ai_win(game, player)) {
+    play_card(game, player, ai_choose_winning_card(game, player));
   } else {
-    play_card(game, player, ai_choose_card(game, player));
+    play_card(game, player, ai_choose_weakest_card(game, player));
   }
 }
 
@@ -34,55 +36,53 @@ bool can_ai_win(Game* game, size_t player) {
   return wins;
 }
 
-size_t ai_choose_card(Game* game, size_t player) {
+size_t ai_choose_winning_card(Game* game, size_t player) {
+  // ai can win, we look for the lowest value card so that it does
+  Player* curr_player = &game->players[player];
+  size_t best_card_index = 0;
+  for (size_t i = 1; i < 8; i++) {
+    Card curr_card = curr_player->cards[i];
+    Card curr_best_card = curr_player->cards[best_card_index];
+    if (!move_check(game, curr_card, player) || !card_wins(game, curr_card, player)) continue;
 
-  size_t card_index = 0;
-  // depending on this, we choose a card by two possible ways:
-  if (can_ai_win(game, player)) {
-    // ai can win, we look for the lowest value card so that it does
-    for (int i = 1; i < 8; i++) {
-      if (
-        card_value(game->players[player].cards[i], *game)
-          < card_value(game->players[player].cards[card_index], *game)
-        && card_wins(game, game->players[player].cards[i], player)) {
-        // if card can't win, we don't even consider it.
-        // if it can and have a lowest value, we play it.
-        card_index = i;
-      } else {
-        // for 7,8 and sometimes 9, value is 0, we have to make a difference
-        // don't need to check when value is higher, won't change card_index
-        if (
-          card_value(game->players[player].cards[i], *game)
-            == card_value(game->players[player].cards[card_index], *game)
-          && card_wins(game, game->players[player].cards[i], player)) {
-          if (
-            game->players[player].cards[i].value < game->players[player].cards[card_index].value) {
-            card_index = i;
-          } // no need to check when value is higher, won't change
-        } // card_index. No need to check when equal because it means
-      } // both cards can be played, having the smallest value yet.
-    }
-  } else {
-    // ai can't win, we just look for the lowest value card
-    for (int i = 1; i < 8; i++) {
-      if (
-        card_value(game->players[player].cards[i], *game) < card_value(
-          game->players[player].cards[card_index],
-          *game)) { // the card has a lower value
-        card_index = i;
-      } else {
-        // for 7,8 and sometimes 9, value is 0, we have to make a difference
-        // don't need to check when value is higher, won't change card_index
-        if (
-          card_value(game->players[player].cards[i], *game)
-          == card_value(game->players[player].cards[card_index], *game)) {
-          if (
-            game->players[player].cards[i].value < game->players[player].cards[card_index].value) {
-            card_index = i;
-          } // no need to check when value is higher, won't change
-        } // card_index. No need to check when equal because it means
-      } // both cards can be played, having the smallest value yet.
-    }
+    if (card_value(curr_card, *game) < card_value(curr_best_card, *game)) {
+      // if card can't win, we don't even consider it.
+      // if it can and have a lowest value, we play it.
+      best_card_index = i;
+    } else if (
+      card_value(curr_card, *game) == card_value(curr_best_card, *game)
+      && curr_card.value < curr_best_card.value) {
+      // for 7,8 and sometimes 9, value is 0, we have to make a difference
+      // don't need to check when value is higher, won't change best_card_index
+      best_card_index = i;
+      // no need to check when value is higher, won't change
+    } // best_card_index. No need to check when equal because it means
+    // both cards can be played, having the smallest value yet.
   }
-  return card_index;
+  return best_card_index;
+}
+
+size_t ai_choose_weakest_card(Game* game, size_t player) {
+  // ai can't win, we just look for the lowest value card
+  Player* curr_player = &game->players[player];
+  size_t best_card_index = 0;
+  for (size_t i = 1; i < 8; i++) {
+    Card curr_card = curr_player->cards[i];
+    Card curr_best_card = curr_player->cards[best_card_index];
+    if (!move_check(game, curr_card, player)) continue;
+
+    if (card_value(curr_card, *game) < card_value(curr_best_card, *game)) {
+      // the card has a lower value
+      best_card_index = i;
+    } else if (
+      card_value(curr_card, *game) == card_value(curr_best_card, *game)
+      && curr_card.value < curr_best_card.value) {
+      // for 7,8 and sometimes 9, value is 0, we have to make a difference
+      // don't need to check when value is higher, won't change best_card_index
+      best_card_index = i;
+      // no need to check when value is higher, won't change
+      // best_card_index. No need to check when equal because it means
+    } // both cards can be played, having the smallest value yet.
+  }
+  return best_card_index;
 }

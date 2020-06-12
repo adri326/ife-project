@@ -14,12 +14,13 @@ void ai_turn(Game* game, size_t player);
 /**
 Check if the AI can beat the current leader.
 */
-bool ai_win(Game* game, size_t player);
+bool can_ai_win(Game* game, size_t player);
 
 /**
 Determine the lowest value card that the AI can play to win if possible and
 the lowest value card otherwise.
 */
-size_t ai_choose_card(Game* game, size_t player);
+size_t ai_choose_winning_card(Game* game, size_t player);
+size_t ai_choose_weakest_card(Game* game, size_t player);
 
 #endif // AI_H
