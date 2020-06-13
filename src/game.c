@@ -168,3 +168,48 @@ bool play_all_turns(Game* game, size_t first_player_index) {
 
   return true;
 }
+
+int dealing_phase (Game* game,size_t dealer) {
+    game->contract_points=0;
+    if ((dealer+1)%4==0) {
+        player_announce_contract(game);
+    } else {
+        ai_announce_contract(game,(dealer+1)%4);
+    }
+    int previous_contract_points=game->contract_points;
+    for (int i=2;i<5;i++)
+    {
+        if ((dealer+i)%4==0) {
+            player_announce_contract(game);
+        } else {
+            ai_announce_contract(game,(dealer+i)%4);
+        }
+    }
+    if (game->contract_points==0)
+    { //nobody took a contract, we have to give new cards.
+        return 0;
+    } else if (game->contract_points==previous_contract_points) {
+        return 1; //everyone passed after 1st player
+    }
+    previous_contract_points=game->contract_points;
+    int player=(dealer+5)%4;
+    int consecutive_pass=0;
+    do {
+        if (player==0){
+            player_announce_contract(game);
+        } else {
+            ai_announce_contract(game,player);
+        }
+        player =(player+1)%4;
+        if (previous_contract_points==game->contract_points) {
+            consecutive_pass=consecutive_pass+1;
+        } else {
+            consecutive_pass=0;
+        }
+        previous_contract_points=game->contract_points;
+    } while (consecutive_pass<3);
+    //we make everyone announce one after an other until
+    //3 people have passed.
+    return 1;
+}
+void dealing_phase (Game* game)

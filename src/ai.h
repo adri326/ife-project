@@ -23,4 +23,11 @@ the lowest value card otherwise.
 size_t ai_choose_winning_card(Game* game, size_t player);
 size_t ai_choose_weakest_card(Game* game, size_t player);
 
+/**
+determines the contract the ai plays and makes it the active contract
+if it is the highest value one so far. Changes the variables in the Game
+structure directly.
+*/
+void ai_announce_contract (Game* game, size_t player);
+
 #endif // AI_H

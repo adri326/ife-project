@@ -86,3 +86,32 @@ size_t ai_choose_weakest_card(Game* game, size_t player) {
   }
   return best_card_index;
 }
+
+void ai_announce_contract (Game* game, size_t player) {
+    int number_stong_cards;
+    for (int j=0; j<4; j++)
+    { //we test every card color one by one
+        number_stong_cards=0;
+        for (int i=0;i<8;i++) {
+                //we check how many strong cards the ai has
+        if (game->players[player].cards[i].value>8
+            && (int)game->players[player].cards[i].type == j)
+            {
+                number_stong_cards=number_stong_cards+1;
+            }
+        }
+        if (number_stong_cards>3 && game->contract_points <120)
+        { //we announce the contract depending on the hand
+            game->active_contract= CHOSENCOLOUR;
+            game->contract_points= 120;
+            game->active_trump= (TrumpColor)j;
+            game->contracted_team=(Teams)player%2;
+        } else if (number_stong_cards==3
+                   && game->contract_points <80) {
+            game->active_contract= CHOSENCOLOUR;
+            game->contract_points= 80;
+            game->active_trump= (TrumpColor)j;
+            game->contracted_team=(Teams)player%2;
+        }
+    }
+}

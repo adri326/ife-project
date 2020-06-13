@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "rules.h"
 
+
 #ifdef _WIN32
 #define IS_WIN
 #endif
@@ -48,5 +49,18 @@ void update_scores(Game* game);
 * @returns true if the game went on, false if the game halted
 **/
 bool play_all_turns(Game* game, size_t first_player_index);
+
+/**
+Player announces their contract. Changes the variables in the Game
+structure directly.
+*/
+void player_announce_contract (Game* game);
+
+/**
+Using player and ai announce_contract functions,
+this function manages the dealing phase. Returns
+0 if nobody took a contract and 1 otherwise.
+*/
+int dealing_phase (Game* game,size_t dealer);
 
 #endif // GAME_H
