@@ -60,4 +60,22 @@ void update_scores(Game* game);
 **/
 bool play_all_turns(Game* game, size_t first_player_index);
 
+/** Distributes the 32 cards to the 4 players
+* Note: the last two cards can be hidden during the announcement phase by overriding each player's n_cards
+* @param cards - The set of cards
+* @param game - The current game
+**/
+void distribute_cards(Card cards[32], Game* game);
+
+/** Initializes 32 cards
+* @param cards - The set of cards, will be modified
+**/
+void init_cards(Card cards[32]);
+
+/** Shuffles the 32 cards
+* All combinations should be theoretically possible
+* @param cards - The set of cards, will be modified
+**/
+void shuffle_cards(Card cards[32]);
+
 #endif // GAME_H

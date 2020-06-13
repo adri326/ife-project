@@ -4,6 +4,8 @@
 BEGIN_TEST(game) {
   EXECUTE_TEST(play_card, "Test that play_card correctly plays a card");
   EXECUTE_TEST(game_turn, "Test that game_turn makes every player play their card");
+  EXECUTE_TEST(init_cards, "Test that init_cards correctly initializes a complete deck of cards.");
+  EXECUTE_TEST(shuffle_cards, "Tests that shuffle_cards shuffles the deck and doesn't loose any card.");
 }
 END_TEST()
 
@@ -67,5 +69,43 @@ BEGIN_TEST(game_turn) {
     ASSERT_EQ_PRI(players[n].cards[0].type, game.pli[n].type, "Type(%d)");
     ASSERT_EQ_PRI(players[n].cards[0].value, game.pli[n].value, "Value(%d)");
   }
+}
+END_TEST()
+
+BEGIN_TEST(init_cards) {
+  Card cards[33];
+  cards[32].type = VOIDCARD;
+  init_cards(cards);
+  for (size_t n = 0; n < 32; n++) {
+    ASSERT_EQ_PRI((int)(n / 8), cards[n].type, "%d");
+    ASSERT_EQ_PRI((int)((n % 8) + 7), cards[n].value, "%d");
+  }
+  ASSERT_EQ_PRI(VOIDCARD, cards[32].type, "%d");
+}
+END_TEST()
+
+BEGIN_TEST(shuffle_cards) {
+  Card cards[33];
+  cards[32].type = VOIDCARD;
+  init_cards(cards);
+  for (int n = 0; n < 100; n++) {
+    shuffle_cards(cards);
+    // O(n^2), sadly :c
+    for (CardColor color = 0; color < 4; color++) {
+      for (uint8_t value = 7; value < 15; value++) {
+        bool found = false;
+        for (size_t n = 0; n < 32; n++) {
+          if (cards[n].type == color && cards[n].value == value) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          ASSERT_MSG(false, "Couldn't find the card (%d, %d) in the shuffled deck!\n", color, value);
+        }
+      }
+    }
+  }
+  ASSERT_EQ_PRI(VOIDCARD, cards[32].type, "%d");
 }
 END_TEST()

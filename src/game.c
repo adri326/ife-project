@@ -86,7 +86,7 @@ bool players_turn(Game* game) {
 }
 
 #endif
-
+// TODO: handle result for AIs
 bool play_card(Game* game, size_t player_index, size_t card_index) {
 #ifdef TEST_ENV
   if (player_index >= 4) {
@@ -193,6 +193,7 @@ bool game_turn(Game* game) {
     } else {
       ai_turn(game, (size_t)current_player);
     }
+    game->trick_leader_position = leader_trick(game, (size_t)current_player);
   }
 
   update_scores(game);
@@ -212,4 +213,45 @@ bool play_all_turns(Game* game, size_t first_player_index) {
   }
 
   return true;
+}
+
+void distribute_cards(Card cards[32], Game* game) {
+  size_t n = 0;
+  int position = 0; // TODO: grab the last dealer
+  #define GIVE(v) for (size_t u = 0; u < (v); u++) game->players[position].cards[game->players[position].n_cards++] = cards[n++];
+  for (size_t x = 0; x < 4; x++) {
+    position = (position + 1) % 4;
+    game->players[position].n_cards = 0;
+    GIVE(3);
+  }
+  for (size_t x = 0; x < 4; x++) {
+    position = (position + 1) % 4;
+    GIVE(2);
+  }
+  for (size_t x = 0; x < 4; x++) {
+    position = (position + 1) % 4;
+    GIVE(3);
+  }
+}
+
+void init_cards(Card cards[32]) {
+  for (size_t n = 0; n < 32; n++) {
+    cards[n].type = n / 8;
+    cards[n].value = (n % 8) + 7;
+  }
+}
+
+void shuffle_cards(Card cards[32]) {
+  Card old_cards[32];
+  for (size_t n = 0; n < 32; n++) {
+    old_cards[n] = cards[n];
+  }
+  for (size_t n = 0; n < 32; n++) {
+    size_t index = rand() % (32 - n);
+    cards[n] = old_cards[index];
+    // lshift cards
+    for (size_t o = index; o < 32 - n - 1; o++) {
+      old_cards[o] = old_cards[o + 1];
+    }
+  }
 }

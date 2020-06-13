@@ -102,20 +102,27 @@ void display_test() {
       {.type = CLOVERS, .value = 13},
       {.type = TILES, .value = 11},
       {.type = CLOVERS, .value = 12},
-      {.type = SPIKES, .value = 12}}};
+      {.type = SPIKES, .value = 12}}
+    };
 
   Game game = {
-    .players = {player, computer1, computer2, computer3},
+    .players = {{}, {}, {}, {}},
     .pli = {
       {.type = VOIDCARD},
       {.type = VOIDCARD},
       {.type = VOIDCARD},
       {.type = VOIDCARD}}};
 
-  ai_turn(&game, 1);
-  ai_turn(&game, 2);
-  ai_turn(&game, 3);
-  players_turn(&game);
+  Card cards[32];
+  init_cards(cards);
+  shuffle_cards(cards);
+  distribute_cards(cards, &game);
+
+  play_all_turns(&game, 1);
+  // ai_turn(&game, 1);
+  // ai_turn(&game, 2);
+  // ai_turn(&game, 3);
+  // players_turn(&game);
 
   destroy_textures();
   SDL_DestroyWindow(window);
