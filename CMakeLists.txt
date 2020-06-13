@@ -46,6 +46,7 @@ target_link_libraries(ife-project
   SDL2::SDL2image
   SDL2::SDL2mixer
   SDL2::SDL2ttf
+  m
 )
 
 

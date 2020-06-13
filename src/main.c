@@ -56,14 +56,14 @@ void display_test() {
   Player player = {
     .n_cards = 6,
     .cards = {
-      {.type = HEARTS, .value = 7},
-      {.type = TILES, .value = 8},
-      {.type = CLOVERS, .value = 9},
-      {.type = SPIKES, .value = 10},
       {.type = HEARTS, .value = 11},
-      {.type = TILES, .value = 12},
-      {.type = CLOVERS, .value = 13},
-      {.type = SPIKES, .value = 14}}};
+      {.type = TILES, .value = 8},
+      {.type = CLOVERS, .value = 14},
+      {.type = SPIKES, .value = 10},
+      {.type = HEARTS, .value = 12},
+      {.type = TILES, .value = 10},
+      {.type = TILES, .value = 9},
+      {.type = TILES, .value = 7}}};
 
   Player computer1 = {
     .cards_revealed = 0b00011100,
@@ -82,36 +82,38 @@ void display_test() {
     .cards_revealed = 0,
     .n_cards = 5,
     .cards = {
-      {.type = HEARTS, .value = 7},
-      {.type = TILES, .value = 8},
-      {.type = CLOVERS, .value = 7},
+      {.type = HEARTS, .value = 8},
+      {.type = TILES, .value = 9},
       {.type = CLOVERS, .value = 8},
       {.type = CLOVERS, .value = 9},
-      {.type = TILES, .value = 12},
-      {.type = CLOVERS, .value = 13},
-      {.type = SPIKES, .value = 14}}};
+      {.type = CLOVERS, .value = 10},
+      {.type = TILES, .value = 13},
+      {.type = CLOVERS, .value = 14},
+      {.type = SPIKES, .value = 13}}};
 
   Player computer3 = {
     .cards_revealed = 0,
     .n_cards = 6,
     .cards = {
-      {.type = HEARTS, .value = 7},
-      {.type = TILES, .value = 8},
-      {.type = CLOVERS, .value = 7},
-      {.type = CLOVERS, .value = 8},
-      {.type = CLOVERS, .value = 9},
-      {.type = TILES, .value = 12},
+      {.type = HEARTS, .value = 9},
+      {.type = TILES, .value = 7},
+      {.type = CLOVERS, .value = 11},
+      {.type = CLOVERS, .value = 12},
       {.type = CLOVERS, .value = 13},
-      {.type = SPIKES, .value = 14}}};
+      {.type = TILES, .value = 11},
+      {.type = CLOVERS, .value = 12},
+      {.type = SPIKES, .value = 12}}};
 
   Game game = {
     .players = {player, computer1, computer2, computer3},
     .pli = {
       {.type = VOIDCARD},
-      {.type = HEARTS, .value = 7},
-      {.type = TILES, .value = 11},
+      {.type = VOIDCARD},
+      {.type = VOIDCARD},
       {.type = VOIDCARD}}};
 
+  ai_turn(&game, 1);
+  ai_turn(&game, 2);
   ai_turn(&game, 3);
   players_turn(&game);
 

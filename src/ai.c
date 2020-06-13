@@ -65,8 +65,9 @@ size_t ai_choose_winning_card(Game* game, size_t player) {
 size_t ai_choose_weakest_card(Game* game, size_t player) {
   // ai can't win, we just look for the lowest value card
   Player* curr_player = &game->players[player];
-  size_t best_card_index = 0;
-  for (size_t i = 1; i < 8; i++) {
+  size_t best_card_index = -1;
+
+  for (size_t i = 1; i < curr_player->n_cards; i++) {
     Card curr_card = curr_player->cards[i];
     Card curr_best_card = curr_player->cards[best_card_index];
     if (!move_check(game, curr_card, player)) continue;
@@ -84,5 +85,13 @@ size_t ai_choose_weakest_card(Game* game, size_t player) {
       // best_card_index. No need to check when equal because it means
     } // both cards can be played, having the smallest value yet.
   }
+
+  if (best_card_index == -1) {
+    // no good card to play; play any playable card. TODO: sort cards?
+    for (size_t n = 0; n < curr_player->n_cards; n++) {
+      if (move_check(game, curr_player->cards[n], player)) return n;
+    }
+  }
+
   return best_card_index;
 }

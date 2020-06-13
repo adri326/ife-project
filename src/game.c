@@ -2,9 +2,11 @@
 #include "ai.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifndef TEST_ENV
 #include "display.h"
+#include <SDL2/SDL.h>
 #endif
 
 #ifdef TEST_ENV
@@ -32,6 +34,7 @@ bool players_turn(Game* game) {
 extern SDL_Renderer* renderer;
 extern uint32_t window_width;
 extern uint32_t window_height;
+extern uint32_t zoom_factor;
 
 bool players_turn(Game* game) {
   int32_t mouse_x = 0;
@@ -84,19 +87,20 @@ bool players_turn(Game* game) {
 
 #endif
 
-void play_card(Game* game, size_t player_index, size_t card_index) {
+bool play_card(Game* game, size_t player_index, size_t card_index) {
 #ifdef TEST_ENV
   if (player_index >= 4) {
     ASSERT_INDENT();
     printf("Player index is out of bound (%zu)", player_index);
-    return;
+    return false;
   }
 #else
-  if (player_index >= 4) return;
+  if (player_index >= 4) return false;
 #endif
 
   Player* player = &game->players[player_index];
 
+  // Check that the card index is within bounds
 #ifdef TEST_ENV
   if (card_index >= player->n_cards) {
     ASSERT_INDENT();
@@ -104,24 +108,22 @@ void play_card(Game* game, size_t player_index, size_t card_index) {
       "Card index is out of bound (%zu >= %" PRIu8 ")",
       card_index,
       player->n_cards);
-    return;
+    return false;
   }
 #else
-  if (card_index >= player->n_cards) return;
+  if (card_index >= player->n_cards) return false;
 #endif
 
-  // Append the card to the current turn, if possible
-  if (game->pli[player_index].type == VOIDCARD) {
-    game->pli[player_index] = player->cards[card_index];
-  }
 #ifdef TEST_ENV
-  else {
+  if (game->pli[player_index].type != VOIDCARD) {
     ASSERT_INDENT();
     printf("No more space left for player %zu's card!", player_index);
   }
 #else
-  else return;
+  if (game->pli[player_index].type != VOIDCARD) return false;
 #endif
+
+  Card current_card = player->cards[card_index];
 
   // Shift the player's cards by one
   for (size_t n = card_index; n < player->n_cards - 1; n++) {
@@ -129,6 +131,49 @@ void play_card(Game* game, size_t player_index, size_t card_index) {
   }
 
   player->n_cards--;
+
+#ifndef TEST_ENV
+  // Animation loop
+  uint32_t loop_start = SDL_GetTicks();
+  const uint32_t anim_length = 500;
+  while (SDL_GetTicks() - loop_start < anim_length) {
+    SDL_Event event;
+    SLEEP(25);
+
+    // Poll events
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_KEYUP) { // Key pressed
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
+            return false;
+        }
+      } else if (event.type == SDL_QUIT) { // Window closed
+        return false;
+      }
+    }
+
+    // Render the current game state
+    render_all(renderer, game, -1);
+
+    float progress = (float)(SDL_GetTicks() - loop_start) / anim_length;
+    uint32_t distance = (1 - INTERPOLATE_EASE_IN_OUT(progress)) * (CARD_WIDTH + 1);
+    render_card_anim(renderer, game, window_width / 2, window_height / 2, player_index, current_card, distance);
+
+    SDL_RenderPresent(renderer);
+  }
+#endif
+
+  bool is_first_card = true;
+  for (size_t n = 0; n < 4; n++) {
+    if (game->pli[n].type != VOIDCARD) is_first_card = false;
+  }
+  if (is_first_card) {
+    game->trick_color = current_card.type;
+  }
+  // Append the card to the current turn, if possible
+  game->pli[player_index] = current_card;
+
+  return true;
 }
 
 bool game_turn(Game* game) {

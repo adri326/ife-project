@@ -403,6 +403,20 @@ void render_round(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y) {
       .h = CARD_HEIGHT * zoom_factor};
     render_card(renderer, game->pli[n].type, game->pli[n].value - 7, 0, &dst_rect);
   }
+#undef SELECT
+}
+
+void render_card_anim(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y, size_t player, Card card, float distance) {
+#define SELECT(a, b, c, d) (player < 2 ? (player == 0 ? (a) : (b)) : (player == 2 ? (c) : (d)))
+  SDL_Rect dst_rect = {
+    .x = x + (int)(SELECT(CARD_WIDTH, -distance, CARD_WIDTH, CARD_WIDTH * 2 + distance) * zoom_factor)
+          - (int)(1.5 * CARD_WIDTH * zoom_factor),
+    .y = y + (int)(SELECT(CARD_HEIGHT * 2 + distance, CARD_HEIGHT, -distance, CARD_HEIGHT) * zoom_factor)
+          - (int)(1.5 * CARD_HEIGHT * zoom_factor),
+    .w = CARD_WIDTH * zoom_factor,
+    .h = CARD_HEIGHT * zoom_factor};
+  render_card(renderer, card.type, card.value - 7, 0, &dst_rect);
+#undef SELECT
 }
 
 void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y) {

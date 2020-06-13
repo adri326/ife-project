@@ -156,6 +156,8 @@ int get_hovered_card(
 **/
 void render_round(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y);
 
+void render_card_anim(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y, size_t player, Card card, float distance);
+
 /** Renders an opponent's deck
 * @param renderer - The current renderer
 * @param ai - The AI's Player struct
