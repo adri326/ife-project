@@ -100,10 +100,7 @@ void play_card(Game* game, size_t player_index, size_t card_index) {
 #ifdef TEST_ENV
   if (card_index >= player->n_cards) {
     ASSERT_INDENT();
-    printf(
-      "Card index is out of bound (%zu >= %" PRIu8 ")",
-      card_index,
-      player->n_cards);
+    printf("Card index is out of bound (%zu >= %" PRIu8 ")", card_index, player->n_cards);
     return;
   }
 #else
@@ -120,7 +117,8 @@ void play_card(Game* game, size_t player_index, size_t card_index) {
     printf("No more space left for player %zu's card!", player_index);
   }
 #else
-  else return;
+  else
+    return;
 #endif
 
   // Shift the player's cards by one
@@ -160,7 +158,8 @@ void update_scores(Game* game) {
 }
 
 bool play_all_turns(Game* game, size_t first_player_index) {
-  game->trick_leader_position = first_player_index < 0 ? 0 : (first_player_index >= 4 ? 3 : first_player_index);
+  game->trick_leader_position =
+    first_player_index < 0 ? 0 : (first_player_index >= 4 ? 3 : first_player_index);
 
   for (size_t n = 0; n < 8; n++) {
     if (!game_turn(game)) return false;
@@ -169,47 +168,42 @@ bool play_all_turns(Game* game, size_t first_player_index) {
   return true;
 }
 
-int dealing_phase (Game* game,size_t dealer) {
-    game->contract_points=0;
-    if ((dealer+1)%4==0) {
-        player_announce_contract(game);
+int dealing_phase(Game* game, size_t dealer) {
+  game->contract_points = 0;
+  for (int i = 1; i < 5; i++) {
+    if ((dealer + i) % 4 == 0) {
+      if (!player_announce_contract(game)) return 2;
     } else {
-        ai_announce_contract(game,(dealer+1)%4);
+      ai_announce_contract(game, (dealer + i) % 4);
     }
-    int previous_contract_points=game->contract_points;
-    for (int i=2;i<5;i++)
-    {
-        if ((dealer+i)%4==0) {
-            player_announce_contract(game);
-        } else {
-            ai_announce_contract(game,(dealer+i)%4);
-        }
+  }
+  int previous_contract_points = game->contract_points;
+  if (game->contract_points == 0) { // nobody took a contract, we have to give new cards.
+    return 0;
+  } else if (game->contract_points == previous_contract_points) {
+    return 1; // everyone passed after 1st player
+  }
+  previous_contract_points = game->contract_points;
+  int player = (dealer + 1) % 4;
+  int consecutive_pass = 0;
+  do {
+    if (player == 0) {
+      if (!player_announce_contract(game)) return 2;
+    } else {
+      ai_announce_contract(game, player);
     }
-    if (game->contract_points==0)
-    { //nobody took a contract, we have to give new cards.
-        return 0;
-    } else if (game->contract_points==previous_contract_points) {
-        return 1; //everyone passed after 1st player
+    player = (player + 1) % 4;
+    if (previous_contract_points == game->contract_points) {
+      consecutive_pass = consecutive_pass + 1;
+    } else {
+      consecutive_pass = 0;
     }
-    previous_contract_points=game->contract_points;
-    int player=(dealer+5)%4;
-    int consecutive_pass=0;
-    do {
-        if (player==0){
-            player_announce_contract(game);
-        } else {
-            ai_announce_contract(game,player);
-        }
-        player =(player+1)%4;
-        if (previous_contract_points==game->contract_points) {
-            consecutive_pass=consecutive_pass+1;
-        } else {
-            consecutive_pass=0;
-        }
-        previous_contract_points=game->contract_points;
-    } while (consecutive_pass<3);
-    //we make everyone announce one after an other until
-    //3 people have passed.
-    return 1;
+    previous_contract_points = game->contract_points;
+  } while (consecutive_pass < 3);
+  // we make everyone announce one after an other until 3 people have passed.
+  return 1;
 }
-void dealing_phase (Game* game)
+
+bool player_announce_contract(Game* game) {
+  return true;
+}

@@ -28,6 +28,6 @@ determines the contract the ai plays and makes it the active contract
 if it is the highest value one so far. Changes the variables in the Game
 structure directly.
 */
-void ai_announce_contract (Game* game, size_t player);
+void ai_announce_contract(Game* game, size_t player);
 
 #endif // AI_H
