@@ -45,6 +45,9 @@
 #define AMASK 0xff000000
 #endif
 
+#define YOUR_TURN_MSG "It is your turn!"
+#define ACTIVE_TRUMP_MSG "Active trump:"
+
 /** Zooms a surface; assumes that `dst`'s dimensions is an integer multiple of these of `src`.
 * Assumes that both `src` and `dst` are 32-bit RGBA surfaces.
 * @param src - The source surface
@@ -179,7 +182,8 @@ void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y);
 * @param renderer - The current renderer
 * @param game - The current game
 * @param hovered_card - The card that should be highlighted
+* @param current_player - The player whose turn it is
 **/
-void render_all(SDL_Renderer* renderer, Game* game, int hovered_card);
+void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t current_player);
 
 #endif // DISPLAY_H

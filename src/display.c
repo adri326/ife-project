@@ -272,8 +272,8 @@ void render_glyph(SDL_Renderer* renderer, char glyph, int32_t x, int32_t y, uint
     index = (size_t)(toupper(glyph) - 'A');
   } else if (glyph >= '0' && glyph <= '9') {
     index = 25 + glyph - '0';
-  } else if (glyph >= 128 && glyph < 192) {
-    index = glyph;
+  } else if (glyph >= -127 && glyph < -63) {
+    index = glyph + 128;
   } else {
     switch (glyph) {
       case '+':
@@ -438,7 +438,7 @@ void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y) 
 extern uint32_t window_width;
 extern uint32_t window_height;
 
-void render_all(SDL_Renderer* renderer, Game* game, int hovered_card) {
+void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t current_player) {
   SDL_SetRenderDrawColor(renderer, BG_RED, BG_GREEN, BG_BLUE, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
 
@@ -455,4 +455,16 @@ void render_all(SDL_Renderer* renderer, Game* game, int hovered_card) {
   render_ai_deck(renderer, &game->players[1], 0, window_height / 2 - CARD_HEIGHT * 2);
   render_ai_deck(renderer, &game->players[2], window_width / 2 - CARD_WIDTH * 4, 0);
   render_ai_deck(renderer, &game->players[3], window_width - CARD_WIDTH * 8, window_height / 2 - CARD_HEIGHT * 2);
+
+  if (current_player == 0) {
+    render_text(renderer, YOUR_TURN_MSG, window_width / 2 - (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor * (strlen(YOUR_TURN_MSG) - 1) / 2, deck_y - GLYPH_HEIGHT * 2 * zoom_factor, 15);
+  }
+
+  uint32_t info_y = window_height - GLYPH_HEIGHT * zoom_factor * 2 - CARD_HEIGHT * 2 * zoom_factor;
+
+  render_text(renderer, ACTIVE_TRUMP_MSG, GLYPH_MARGIN * zoom_factor, info_y, 0);
+  if (game->active_trump < 4) {
+    char str[2] = {128 + 37 + game->active_trump, 0};
+    render_text(renderer, str, (GLYPH_MARGIN + (GLYPH_WIDTH + GLYPH_MARGIN) * strlen(ACTIVE_TRUMP_MSG)) * zoom_factor, info_y, 12);
+  }
 }

@@ -77,7 +77,7 @@ bool players_turn(Game* game) {
     }
 
     // Render the current game state
-    render_all(renderer, game, hovered_card);
+    render_all(renderer, game, hovered_card, 0);
 
     SDL_RenderPresent(renderer);
   }
@@ -153,7 +153,7 @@ bool play_card(Game* game, size_t player_index, size_t card_index) {
     }
 
     // Render the current game state
-    render_all(renderer, game, -1);
+    render_all(renderer, game, -1, player_index);
 
     float progress = (float)(SDL_GetTicks() - loop_start) / anim_length;
     uint32_t distance = (1 - INTERPOLATE_EASE_IN_OUT(progress)) * (CARD_WIDTH + 1);

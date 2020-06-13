@@ -107,6 +107,7 @@ void display_test() {
 
   Game game = {
     .players = {{}, {}, {}, {}},
+    .active_trump = TRUMP_HEARTS,
     .pli = {
       {.type = VOIDCARD},
       {.type = VOIDCARD},
