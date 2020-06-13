@@ -156,6 +156,15 @@ int get_hovered_card(
 **/
 void render_round(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y);
 
+/** Renders a card that will be put at the center of the board
+* @param renderer - The current renderer
+* @param game - The current Game
+* @param x - Center of the board
+* @param y - Center of the board
+* @param player - The player that is playing this card
+* @param card - The card to display
+* @param distance - The distance to its intended spot
+**/
 void render_card_anim(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y, size_t player, Card card, float distance);
 
 /** Renders an opponent's deck
