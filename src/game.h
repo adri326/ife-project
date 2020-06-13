@@ -6,6 +6,7 @@
 #include <math.h>
 #include "rules.h"
 
+
 #ifdef _WIN32
 #define IS_WIN
 #endif
@@ -77,5 +78,18 @@ void init_cards(Card cards[32]);
 * @param cards - The set of cards, will be modified
 **/
 void shuffle_cards(Card cards[32]);
+
+/**
+Player announces their contract. Changes the variables in the Game
+structure directly.
+*/
+bool player_announce_contract(Game* game);
+
+/**
+Using player and ai announce_contract functions,
+this function manages the dealing phase. Returns
+0 if nobody took a contract and 1 on success and 2 on exit
+*/
+int dealing_phase(Game* game,size_t dealer);
 
 #endif // GAME_H
