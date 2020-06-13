@@ -462,9 +462,13 @@ void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t cur
 
   uint32_t info_y = window_height - GLYPH_HEIGHT * zoom_factor * 2 - CARD_HEIGHT * 2 * zoom_factor;
 
-  render_text(renderer, ACTIVE_TRUMP_MSG, GLYPH_MARGIN * zoom_factor, info_y, 0);
   if (game->active_trump < 4) {
+    render_text(renderer, ACTIVE_TRUMP_MSG, GLYPH_MARGIN * zoom_factor, info_y, 0);
     char str[2] = {128 + 37 + game->active_trump, 0};
-    render_text(renderer, str, (GLYPH_MARGIN + (GLYPH_WIDTH + GLYPH_MARGIN) * strlen(ACTIVE_TRUMP_MSG)) * zoom_factor, info_y, 12);
+    render_text(renderer, str, (GLYPH_MARGIN + (GLYPH_WIDTH + GLYPH_MARGIN) * strlen(ACTIVE_TRUMP_MSG)) * zoom_factor, info_y, game->active_trump < 2 ? 12 : 0);
+  } else if (game->active_trump == 4) {
+    render_text(renderer, ALLTRUMP_MSG, GLYPH_MARGIN * zoom_factor, info_y, 0);
+  } else {
+    render_text(renderer, NOTRUMP_MSG, GLYPH_MARGIN * zoom_factor, info_y, 0);
   }
 }

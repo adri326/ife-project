@@ -47,6 +47,8 @@
 
 #define YOUR_TURN_MSG "It is your turn!"
 #define ACTIVE_TRUMP_MSG "Active trump:"
+#define ALLTRUMP_MSG "All trump"
+#define NOTRUMP_MSG "No trump"
 
 /** Zooms a surface; assumes that `dst`'s dimensions is an integer multiple of these of `src`.
 * Assumes that both `src` and `dst` are 32-bit RGBA surfaces.

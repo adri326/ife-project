@@ -197,6 +197,13 @@ bool game_turn(Game* game) {
   }
 
   update_scores(game);
+  printf("(%d, %d) : (%d, %d) : (%d, %d) : (%d, %d) -> %d\n",
+    game->pli[0].type, game->pli[0].value,
+    game->pli[1].type, game->pli[1].value,
+    game->pli[2].type, game->pli[2].value,
+    game->pli[3].type, game->pli[3].value,
+    game->trick_leader_position
+  );
 
   return true;
 }
