@@ -16,28 +16,38 @@
 uint32_t zoom_factor;
 uint32_t window_width;
 uint32_t window_height;
+SDL_Window* window;
 SDL_Renderer* renderer;
 
-void display_test(void);
+void run_game(void);
+bool display_title(void);
+void display_init(void);
+void display_destroy(void);
+bool display_main_menu(void);
 
 int main(int argc, char* argv[]) {
   srand(time(0));
-  // Game game;
-  // Teams active_team; // variable that will help each time a function needs to
-  //                    // know what team is concerned, e.g.: for the contracts
 
-  display_test();
+  display_init();
+  while (true) {
+    if (!display_title()) break;
+    if (!display_main_menu()) break;
+
+    run_game();
+  }
+
+  display_destroy();
 
   return 0;
 }
 
-void display_test() {
+void display_init() {
   SDL_Init(SDL_INIT_VIDEO);
   zoom_factor = 4;
   window_width = (CARD_WIDTH + 2) * 12 * 4;
   window_height = (CARD_HEIGHT + 2) * 8 * 4;
 
-  SDL_Window* window = SDL_CreateWindow(
+  window = SDL_CreateWindow(
     "This needs a title",
     SDL_WINDOWPOS_UNDEFINED,
     SDL_WINDOWPOS_UNDEFINED,
@@ -52,59 +62,127 @@ void display_test() {
   SDL_RenderPresent(renderer);
 
   if (!init_textures(renderer, 4)) { printf("Uh oh! %s\n", SDL_GetError()); }
+}
 
-  Player player = {
-    .n_cards = 6,
-    .cards = {
-      {.type = HEARTS, .value = 11},
-      {.type = TILES, .value = 8},
-      {.type = CLOVERS, .value = 14},
-      {.type = SPIKES, .value = 10},
-      {.type = HEARTS, .value = 12},
-      {.type = TILES, .value = 10},
-      {.type = TILES, .value = 9},
-      {.type = TILES, .value = 7}}};
+bool display_title() {
+  // Display loop
+  int anim_start = SDL_GetTicks();
+  while (true) {
+    SDL_Event event;
+    SLEEP(50);
 
-  Player computer1 = {
-    .cards_revealed = 0b00011100,
-    .n_cards = 5,
-    .cards = {
-      {.type = HEARTS, .value = 7},
-      {.type = TILES, .value = 8},
-      {.type = CLOVERS, .value = 7},
-      {.type = CLOVERS, .value = 8},
-      {.type = CLOVERS, .value = 9},
-      {.type = TILES, .value = 12},
-      {.type = CLOVERS, .value = 13},
-      {.type = SPIKES, .value = 14}}};
+    // Poll events
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_KEYUP) { // Key pressed
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
+            return false;
+          default:
+            return true;
+        }
+      } else if (event.type == SDL_QUIT) { // Window closed
+        return false;
+      } else if (event.type == SDL_MOUSEBUTTONDOWN) { // Mouse pressed
+        return true;
+      }
+    }
 
-  Player computer2 = {
-    .cards_revealed = 0,
-    .n_cards = 5,
-    .cards = {
-      {.type = HEARTS, .value = 8},
-      {.type = TILES, .value = 9},
-      {.type = CLOVERS, .value = 8},
-      {.type = CLOVERS, .value = 9},
-      {.type = CLOVERS, .value = 10},
-      {.type = TILES, .value = 13},
-      {.type = CLOVERS, .value = 14},
-      {.type = SPIKES, .value = 13}}};
+    SDL_SetRenderDrawColor(renderer, BG_RED, BG_GREEN, BG_BLUE, SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(renderer);
 
-  Player computer3 = {
-    .cards_revealed = 0,
-    .n_cards = 6,
-    .cards = {
-      {.type = HEARTS, .value = 9},
-      {.type = TILES, .value = 7},
-      {.type = CLOVERS, .value = 11},
-      {.type = CLOVERS, .value = 12},
-      {.type = CLOVERS, .value = 13},
-      {.type = TILES, .value = 11},
-      {.type = CLOVERS, .value = 12},
-      {.type = SPIKES, .value = 12}}
-    };
+    render_title(renderer, window_width / 2, window_height / 4);
 
+    if (((SDL_GetTicks() - anim_start) / 1000) % 2 == 0) {
+      render_text(
+        renderer,
+        INTRO_MSG,
+        window_width / 2 - strlen(INTRO_MSG) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2,
+        window_height - GLYPH_HEIGHT * 2 * zoom_factor,
+        0
+      );
+    }
+
+    SDL_RenderPresent(renderer);
+  }
+}
+
+bool display_main_menu() {
+  int screen = 0;
+  int32_t mouse_x = 0;
+  int32_t mouse_y = 0;
+
+#define PRINT_CENTER_AROUND(text, x, y, color) render_text(renderer, (text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, color)
+#define PRINT_CENTER(text, y, color) PRINT_CENTER_AROUND(text, window_width / 2, y, color)
+#define BUTTON_CENTER_AROUND(text, x, y, color) render_button( \
+  renderer, \
+  (text), \
+  x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, \
+  y, \
+  is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y), \
+  color)
+#define BUTTON_CENTER(text, y, color) BUTTON_CENTER_AROUND(text, window_width / 2, y, color)
+#define SHIFT_Y(n) ((GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor * n)
+#define HANDLE_BUTTON(text, x, y) if (is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y))
+
+  // Display loop
+  while (true) {
+    SDL_Event event;
+    SLEEP(50);
+
+    // Poll events
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_KEYUP) { // Key pressed
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
+            return false;
+          default:
+            if (screen == 1) screen = 0;
+        }
+      } else if (event.type == SDL_QUIT) { // Window closed
+        return false;
+      } else if (event.type == SDL_MOUSEMOTION) { // Mouse moved
+        mouse_x = event.motion.x;
+        mouse_y = event.motion.y;
+      } else if (event.type == SDL_MOUSEBUTTONDOWN) { // Mouse pressed: play card if possible
+        switch (screen) {
+          case 0:
+            HANDLE_BUTTON("Play!", window_width / 2, window_height / 2 + SHIFT_Y(-2)) {
+              return true;
+            }
+            HANDLE_BUTTON("Leaderboards", window_width / 2, window_height / 2 + SHIFT_Y(0)) {
+              screen = 1;
+            }
+            HANDLE_BUTTON("Exit", window_width / 2, window_height / 2 + SHIFT_Y(2)) {
+              return false;
+            }
+            break;
+          case 1:
+            screen = 0;
+            break;
+        }
+      }
+    }
+
+    SDL_SetRenderDrawColor(renderer, BG_RED, BG_GREEN, BG_BLUE, SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(renderer);
+
+    if (screen == 0) render_title(renderer, window_width / 2, window_height / 4);
+
+    switch (screen) {
+      case 0:
+        BUTTON_CENTER("Play!", window_height / 2 + SHIFT_Y(-2), 0);
+        BUTTON_CENTER("Leaderboards", window_height / 2 + SHIFT_Y(0), 0);
+        BUTTON_CENTER("Exit", window_height / 2 + SHIFT_Y(2), 0);
+        break;
+      case 1:
+        PRINT_CENTER("Leaderboards", window_height / 4, 9);
+    }
+
+    SDL_RenderPresent(renderer);
+  }
+}
+
+void run_game() {
   Game game = {
     .players = {{}, {}, {}, {}},
     .active_trump = TRUMP_HEARTS,
@@ -119,12 +197,16 @@ void display_test() {
 
   Card cards[32];
   init_cards(cards);
-  shuffle_cards(cards);
-  distribute_cards(cards, &game);
-  for (size_t n = 0; n < 4; n++) {
-    game.players[n].n_cards = 5;
-  }
-  dealing_phase(&game, 0);
+  int dealing_res;
+  do {
+    shuffle_cards(cards);
+    distribute_cards(cards, &game);
+    for (size_t n = 0; n < 4; n++) {
+      game.players[n].n_cards = 5;
+    }
+    dealing_res = dealing_phase(&game, 0);
+    if (dealing_res == 2) return;
+  } while (dealing_res == 0);
   for (size_t n = 0; n < 4; n++) {
     game.players[n].n_cards = 8;
   }
@@ -134,7 +216,9 @@ void display_test() {
   // ai_turn(&game, 2);
   // ai_turn(&game, 3);
   // players_turn(&game);
+}
 
+void display_destroy() {
   destroy_textures();
   SDL_DestroyWindow(window);
   SDL_Quit();

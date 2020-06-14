@@ -56,6 +56,7 @@ static SDL_Texture* buttons = NULL;
 static SDL_Texture* cards[4][8];
 static SDL_Rect card_rect;
 static SDL_Texture* glyphs[16][8][8];
+static SDL_Texture* title = NULL;
 extern uint32_t zoom_factor;
 
 #define SHIFT_Y(n) ((GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * (n))
@@ -83,6 +84,11 @@ bool init_textures(SDL_Renderer* renderer, uint32_t factor) {
   if (!colors_raw) return false;
   SDL_Surface* colors = zoom(colors_raw, factor);
   SDL_FreeSurface(colors_raw);
+
+  SDL_Surface* title_raw = IMG_Load(RESOURCES_DIR "title.png");
+  if (!title_raw) return false;
+  title = SDL_CreateTextureFromSurface(renderer, title_raw);
+  SDL_FreeSurface(title_raw);
 
   // top-left number destination
   SDL_Rect num1_dst = {
@@ -225,11 +231,28 @@ void destroy_textures() {
 
   SDL_DestroyTexture(outlines);
   SDL_DestroyTexture(buttons);
+  SDL_DestroyTexture(title);
 }
 
 SDL_Texture* get_texture(CardColor color, uint8_t number) {
   if (number >= 8) return NULL;
   return cards[color][number];
+}
+
+void render_title(SDL_Renderer* renderer, uint32_t x, uint32_t y) {
+  SDL_Rect src = {
+    .x = 0,
+    .y = 0,
+    .w = TITLE_WIDTH,
+    .h = TITLE_HEIGHT
+  };
+  SDL_Rect dst = {
+    .x = x - TITLE_WIDTH / 2,
+    .y = y - TITLE_HEIGHT / 2,
+    .w = TITLE_WIDTH,
+    .h = TITLE_HEIGHT
+  };
+  SDL_RenderCopy(renderer, title, &src, &dst);
 }
 
 SDL_Rect get_card_rect() {

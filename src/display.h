@@ -29,6 +29,9 @@
 #define LINE_HEIGHT 7
 #define GLYPH_MARGIN 1
 
+#define TITLE_WIDTH 250
+#define TITLE_HEIGHT 250
+
 #define BG_RED 189
 #define BG_GREEN 204
 #define BG_BLUE 210
@@ -56,6 +59,7 @@
 #define GENERAL_MSG "General("
 #define COINCHE_MSG "Coinche"
 #define SURCOINCHE_MSG "Surcoinche"
+#define INTRO_MSG "Press a key to start..."
 
 /** Zooms a surface; assumes that `dst`'s dimensions is an integer multiple of these of `src`.
 * Assumes that both `src` and `dst` are 32-bit RGBA surfaces.
@@ -97,6 +101,13 @@ SDL_Texture* get_texture(CardColor color, uint8_t number);
 
 /** Returns the SDL_Rect corresponding to the dimensions of a card texture **/
 SDL_Rect get_card_rect();
+
+/** Renders the title
+* @param renderer - The current renderer
+* @param x - The X coordinate of the center of the title
+* @param y - The Y coordinate of the center of the title
+**/
+void render_title(SDL_Renderer* renderer, uint32_t x, uint32_t y);
 
 /** Renders a card
 * @param renderer - The current renderer
@@ -196,12 +207,37 @@ void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y);
 **/
 void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t current_player, bool render_extras);
 
+/** Renders a button
+* @param renderer - The renderer
+* @param text - The text to put inside of the button
+* @param x - The x position of the button (top-left corner of the inner text)
+* @param y - The y position of the button (top-left corner of the inner text)
+* @param state - The state of the button (pressed/not pressed)
+* @param color - The color of the text inside of the button
+**/
 void render_button(SDL_Renderer* renderer, char* text, uint32_t x, uint32_t y, bool state, uint8_t color);
 
+/** Returns wether or not a button is being hovered
+* @param text - The text to put inside of the button
+* @param button_x - The x position of the button (top-left corner of the inner text)
+* @param button_y - The y position of the button (top-left corner of the inner text)
+* @param mouse_x - The mouse X position
+* @param mouse_y - The mouse Y position
+* @returns true if the button is hovered, false otherwise
+**/
 bool is_button_hovered(char* text, uint32_t button_x, uint32_t button_y, int32_t mouse_x, int32_t mouse_y);
 
+/** Renders the bid made so far
+* @param renderer - The current renderer
+* @param game - The current game
+**/
 void render_bids(SDL_Renderer* renderer, Game* game);
 
-void render_player_arrow_anim(SDL_Renderer* renderer, size_t player, float distance);
+/** Renders an arrow point to a player's deck
+* @param renderer - The current renderer
+* @param player - The player ot point towards
+* @param progress - The progress of the animation
+**/
+void render_player_arrow_anim(SDL_Renderer* renderer, size_t player, float progress);
 
 #endif // DISPLAY_H

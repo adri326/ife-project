@@ -358,8 +358,8 @@ int dealing_phase(Game* game, size_t dealer) {
       if (!player_announce_contract(game)) return 2;
     } else {
       ai_announce_contract(game, (dealer + i) % 4);
+      if (!anim_dealer(game, (dealer + i) % 4)) return 2;
     }
-    if (!anim_dealer(game, (dealer + i) % 4)) return 2;
   }
   int previous_contract_points = game->contract_points;
   if (game->contract_points == 0) { // nobody took a contract, we have to give new cards.
@@ -375,8 +375,8 @@ int dealing_phase(Game* game, size_t dealer) {
       if (!player_announce_contract(game)) return 2;
     } else {
       ai_announce_contract(game, player);
+      if (!anim_dealer(game, player)) return 2;
     }
-    if (!anim_dealer(game, player)) return 2;
     player = (player + 1) % 4;
     if (previous_contract_points == game->contract_points) {
       consecutive_pass = consecutive_pass + 1;
@@ -416,8 +416,9 @@ bool player_announce_contract(Game* game) {
   #define HANDLE_BUTTON(text, x, y) if (is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y))
   #define COLUMN_SPACING (GLYPH_WIDTH * 10 * zoom_factor)
   #define BUTTON_SPACING ((GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor * 3)
-  if (game->contract_points < 80) game->contract_points = 80;
+
   int points = game->contract_points + 10;
+  if (game->contract_points < 80) points = 80;
   int contract_type = 0;
   int color = 0;
   while (true) {
@@ -466,7 +467,7 @@ bool player_announce_contract(Game* game) {
             }
 
             HANDLE_BUTTON("-", window_width / 2 - COLUMN_SPACING - GLYPH_WIDTH * 4 * zoom_factor, window_height / 2 + SHIFT_Y(-5)) {
-              if (points > game->contract_points + 10) points -= 10;
+              if (points > game->contract_points + 10 || (game->contract_points <= 0 && points > 80)) points -= 10;
             }
             HANDLE_BUTTON("+", window_width / 2 - COLUMN_SPACING + GLYPH_WIDTH * 4 * zoom_factor, window_height / 2 + SHIFT_Y(-5)) {
               if (points < 240) points += 10;
@@ -494,6 +495,8 @@ bool player_announce_contract(Game* game) {
               game->active_contract = contract_type == 0 ? CHOSENCOLOUR : contract_type == 1 ? CAPOT : GENERAL;
               game->contract_points = contract_type == 0 ? points : contract_type == 1 ? CAPOT_POINTS : GENERAL_POINTS;
               game->active_trump = color;
+              game->contracted_team = NS;
+              game->general_attacker = 0;
               return true;
             }
         }
