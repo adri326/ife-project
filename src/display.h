@@ -195,4 +195,8 @@ void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y);
 **/
 void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t current_player);
 
+void render_button(SDL_Renderer* renderer, char* text, uint32_t x, uint32_t y, bool state, uint8_t color);
+
+bool is_button_hovered(char* text, uint32_t button_x, uint32_t button_y, int32_t mouse_x, int32_t mouse_y);
+
 #endif // DISPLAY_H
