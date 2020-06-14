@@ -97,6 +97,7 @@ size_t ai_choose_weakest_card(Game* game, size_t player) {
 }
 
 void ai_announce_contract(Game* game, size_t player) {
+  return;
   int number_stong_cards;
   for (int j = 0; j < 4; j++) {
     // we test every card color one by one

@@ -202,4 +202,6 @@ bool is_button_hovered(char* text, uint32_t button_x, uint32_t button_y, int32_t
 
 void render_bids(SDL_Renderer* renderer, Game* game);
 
+void render_player_arrow_anim(SDL_Renderer* renderer, size_t player, float distance);
+
 #endif // DISPLAY_H

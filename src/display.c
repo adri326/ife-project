@@ -605,8 +605,7 @@ void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t cur
   }
 
   uint32_t info_x = GLYPH_MARGIN * zoom_factor;
-  uint32_t info_y =
-    window_height - (GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * 3 - CARD_HEIGHT * 2 * zoom_factor;
+  uint32_t info_y = GLYPH_MARGIN * zoom_factor;
 
   // Extras - contract, coinched, etc.
   if (render_extras) {
@@ -681,8 +680,12 @@ void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t cur
 }
 
 void render_bids(SDL_Renderer* renderer, Game* game) {
-  if (game->active_contract == -1) return;
 #define PRINT_CENTER(text, y, color) render_text(renderer, (text), window_width / 2 - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, color)
+  if (game->active_contract == -1) {
+    PRINT_CENTER("Noone bid yet!", window_height / 2 + SHIFT_Y(-2), 0);
+    return;
+  }
+
   char attacker_str[32] = {0};
   char contract_str[32] = {0};
   char* pos_str = game->general_attacker < 2 ? (game->general_attacker == 0 ? "South" : "West") : (game->general_attacker == 2 ? "North" : "East");
@@ -719,5 +722,18 @@ void render_bids(SDL_Renderer* renderer, Game* game) {
     PRINT_CENTER("coinche", window_height / 2 + SHIFT_Y(-1), 0);
   } else if (game->active_contract == SURCOINCHE) {
     PRINT_CENTER("surcoinche", window_height / 2 + SHIFT_Y(-1), 0);
+  }
+}
+
+void render_player_arrow_anim(SDL_Renderer* renderer, size_t player, float progress) {
+  int distance = (int)((1 - progress) * zoom_factor * GLYPH_HEIGHT);
+  if (player == 1) {
+    render_text(renderer, "<", CARD_WIDTH * 2 * zoom_factor + GLYPH_WIDTH * zoom_factor + distance, window_height / 2 + GLYPH_HEIGHT * zoom_factor / 2, 8);
+  } else if (player == 2) {
+    render_text(renderer, "^", window_width / 2 - GLYPH_WIDTH * zoom_factor / 2, CARD_HEIGHT * zoom_factor + GLYPH_HEIGHT * zoom_factor + distance, 8);
+  } else if (player == 3) {
+    render_text(renderer, ">", window_width - CARD_WIDTH * 2 * zoom_factor - GLYPH_WIDTH * zoom_factor - distance, window_height / 2 + GLYPH_HEIGHT * zoom_factor / 2, 8);
+  } else {
+    render_text(renderer, "v", window_width / 2 - GLYPH_WIDTH * zoom_factor / 2, window_height - CARD_HEIGHT * zoom_factor - GLYPH_HEIGHT * zoom_factor * 2 - distance, 8);
   }
 }

@@ -205,6 +205,51 @@ bool game_turn(Game* game) {
     game->trick_leader_position
   );
 
+#ifndef TEST_ENV
+  // Animation loop
+  uint32_t loop_start = SDL_GetTicks();
+  const uint32_t anim_length = 1000;
+  while (SDL_GetTicks() - loop_start < anim_length) {
+    SDL_Event event;
+    SLEEP(25);
+
+    // Poll events
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_KEYUP) { // Key pressed
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
+            return false;
+        }
+      } else if (event.type == SDL_QUIT) { // Window closed
+        return false;
+      }
+    }
+
+    // Render the current game state
+    render_all(renderer, game, -1, -1, true);
+
+    char* winner_str = game->trick_leader_position < 2
+      ? (game->trick_leader_position == 0 ? "You won the trick" : "West won the trick")
+      : (game->trick_leader_position == 2 ? "North won the trick" : "East won the trick");
+
+    render_text(
+      renderer,
+      winner_str,
+      window_width / 2 - strlen(winner_str) * (GLYPH_MARGIN + GLYPH_WIDTH) * zoom_factor / 2,
+      window_height / 2 - GLYPH_HEIGHT * zoom_factor * 12,
+      0
+    );
+
+    render_player_arrow_anim(
+      renderer,
+      game->trick_leader_position,
+      INTERPOLATE_EASE_IN_OUT((float)(SDL_GetTicks() - loop_start) / anim_length)
+    );
+
+    SDL_RenderPresent(renderer);
+  }
+#endif
+
   return true;
 }
 
@@ -294,13 +339,11 @@ bool anim_dealer(Game* game, size_t dealer) {
     // Render the current game state
     render_all(renderer, game, -1, -1, false);
     render_bids(renderer, game);
-    if (dealer == 1) {
-      render_text(renderer, "<", CARD_WIDTH * 2 * zoom_factor + GLYPH_WIDTH * zoom_factor, window_height / 2 + GLYPH_HEIGHT * zoom_factor / 2, 8);
-    } else if (dealer == 2) {
-      render_text(renderer, "^", window_width / 2 - GLYPH_WIDTH * zoom_factor / 2, CARD_HEIGHT * zoom_factor + GLYPH_HEIGHT * zoom_factor, 8);
-    } else if (dealer == 3) {
-      render_text(renderer, ">", window_width - CARD_WIDTH * 2 * zoom_factor - GLYPH_WIDTH * zoom_factor, window_height / 2 + GLYPH_HEIGHT * zoom_factor / 2, 8);
-    }
+    render_player_arrow_anim(
+      renderer,
+      dealer,
+      INTERPOLATE_EASE_IN_OUT((float)(SDL_GetTicks() - loop_start) / anim_length)
+    );
 
     SDL_RenderPresent(renderer);
   }
@@ -373,7 +416,7 @@ bool player_announce_contract(Game* game) {
   #define HANDLE_BUTTON(text, x, y) if (is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y))
   #define COLUMN_SPACING (GLYPH_WIDTH * 10 * zoom_factor)
   #define BUTTON_SPACING ((GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor * 3)
-
+  if (game->contract_points < 80) game->contract_points = 80;
   int points = game->contract_points + 10;
   int contract_type = 0;
   int color = 0;
@@ -396,9 +439,6 @@ bool player_announce_contract(Game* game) {
       } else if (event.type == SDL_MOUSEBUTTONDOWN) { // Mouse pressed: handle buttons
         switch (screen) {
           case 0:
-            if (game->general_attacker >= 0) {
-              render_bids(renderer, game);
-            }
             HANDLE_BUTTON("Pass", window_width / 2, window_height / 2 + SHIFT_Y(2)) {
               return true;
             }
@@ -465,9 +505,7 @@ bool player_announce_contract(Game* game) {
 
     switch (screen) {
       case 0:
-        if (game->general_attacker >= 0) {
-          render_bids(renderer, game);
-        }
+        render_bids(renderer, game);
         BUTTON_CENTER("Pass", window_height / 2 + SHIFT_Y(2), 0);
         BUTTON_CENTER("Bid", window_height / 2 + SHIFT_Y(4), 0);
         if (game->general_attacker == 3 && game->active_contract != SURCOINCHE) {
