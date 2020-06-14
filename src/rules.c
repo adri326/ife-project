@@ -116,14 +116,14 @@ Teams contract_check(Game game) {
         // The contract to verify corresponds to the points in contract_points:
         // 250 = capot, 500 = general, other = default = classic point goal contract
         switch (game.contract_points) {
-          case 250:
+          case CAPOT_POINTS:
             if (defender_1->tricks_won + defender_2->tricks_won == 8) {
               return defenders_win(game.contracted_team);
             } else {
               return attackers_win(game.contracted_team);
             }
             break;
-          case 500:
+          case GENERAL_POINTS:
             if (game.players[game.general_attacker].tricks_won == 8) {
               return defenders_win(game.contracted_team);
             } else {
@@ -147,14 +147,14 @@ Teams contract_check(Game game) {
         // attacker team must have filled their contract for the
         // surcoinche to be realized
         switch (game.contract_points) {
-          case 250:
+          case CAPOT_POINTS:
             if (attacker_1->tricks_won + attacker_2->tricks_won == 8) {
               return attackers_win(game.contracted_team);
             } else {
               return defenders_win(game.contracted_team);
             }
             break;
-          case 500:
+          case GENERAL_POINTS:
             if (game.players[game.general_attacker].tricks_won == 8) {
               return attackers_win(game.contracted_team);
             } else {

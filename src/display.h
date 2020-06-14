@@ -49,6 +49,13 @@
 #define ACTIVE_TRUMP_MSG "Active trump:"
 #define ALLTRUMP_MSG "All trump"
 #define NOTRUMP_MSG "No trump"
+#define CONTRACTED_TEAM_MSG "Contracted:"
+#define CHOSENCOLOUR_MSG "Point goal:"
+#define GOAL_MSG "Goal:"
+#define CAPOT_MSG "Capot"
+#define GENERAL_MSG "General("
+#define COINCHE_MSG "Coinche"
+#define SURCOINCHE_MSG "Surcoinche"
 
 /** Zooms a surface; assumes that `dst`'s dimensions is an integer multiple of these of `src`.
 * Assumes that both `src` and `dst` are 32-bit RGBA surfaces.

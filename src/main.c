@@ -107,7 +107,10 @@ void display_test() {
 
   Game game = {
     .players = {{}, {}, {}, {}},
-    .active_trump = ALLTRUMP,
+    .active_trump = TRUMP_HEARTS,
+    .contract_points = 500,
+    .active_contract = SURCOINCHE,
+    .general_attacker = 1,
     .pli = {
       {.type = VOIDCARD},
       {.type = VOIDCARD},

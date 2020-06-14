@@ -85,6 +85,9 @@ struct Game {
 };
 typedef struct Game Game;
 
+#define CAPOT_POINTS 250
+#define GENERAL_POINTS 500
+
 // TODO: rename turn_points to game_points or final_points
 
 /**

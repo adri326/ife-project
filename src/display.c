@@ -271,7 +271,7 @@ void render_glyph(SDL_Renderer* renderer, char glyph, int32_t x, int32_t y, uint
   if ((glyph >= 'a' && glyph <= 'z') || (glyph >= 'A' && glyph <= 'Z')) {
     index = (size_t)(toupper(glyph) - 'A');
   } else if (glyph >= '0' && glyph <= '9') {
-    index = 25 + glyph - '0';
+    index = 26 + glyph - '0';
   } else if (glyph >= -127 && glyph < -63) {
     index = glyph + 128;
   } else {
@@ -310,9 +310,11 @@ void render_glyph(SDL_Renderer* renderer, char glyph, int32_t x, int32_t y, uint
         index = 51;
         break;
       case '<':
+      case '(':
         index = 52;
         break;
       case '>':
+      case ')':
         index = 53;
         break;
       case '"':
@@ -460,15 +462,51 @@ void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t cur
     render_text(renderer, YOUR_TURN_MSG, window_width / 2 - (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor * (strlen(YOUR_TURN_MSG) - 1) / 2, deck_y - GLYPH_HEIGHT * 2 * zoom_factor, 15);
   }
 
-  uint32_t info_y = window_height - GLYPH_HEIGHT * zoom_factor * 2 - CARD_HEIGHT * 2 * zoom_factor;
+  uint32_t info_x = GLYPH_MARGIN * zoom_factor;
+  uint32_t info_y = window_height - (GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * 3 - CARD_HEIGHT * 2 * zoom_factor;
+#define SHIFT_Y(n) ((GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * (n))
+#define SHIFT_X(n) ((n) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor)
 
-  if (game->active_trump < 4) {
-    render_text(renderer, ACTIVE_TRUMP_MSG, GLYPH_MARGIN * zoom_factor, info_y, 0);
-    char str[2] = {128 + 37 + game->active_trump, 0};
-    render_text(renderer, str, (GLYPH_MARGIN + (GLYPH_WIDTH + GLYPH_MARGIN) * strlen(ACTIVE_TRUMP_MSG)) * zoom_factor, info_y, game->active_trump < 2 ? 12 : 0);
-  } else if (game->active_trump == 4) {
-    render_text(renderer, ALLTRUMP_MSG, GLYPH_MARGIN * zoom_factor, info_y, 0);
+  // Contracted team
+  render_text(renderer, CONTRACTED_TEAM_MSG, info_x, info_y, 8);
+  if (game->contracted_team == NS) {
+    render_text(renderer, "N/S", info_x + SHIFT_X(strlen(CONTRACTED_TEAM_MSG)), info_y, 0);
   } else {
-    render_text(renderer, NOTRUMP_MSG, GLYPH_MARGIN * zoom_factor, info_y, 0);
+    render_text(renderer, "E/W", info_x + SHIFT_X(strlen(CONTRACTED_TEAM_MSG)), info_y, 0);
+  }
+
+  // Active trump
+  if (game->active_trump < 4) {
+    render_text(renderer, ACTIVE_TRUMP_MSG, info_x, info_y + SHIFT_Y(1), 8);
+    char str[2] = {128 + 37 + game->active_trump, 0};
+    render_text(renderer, str, info_x + SHIFT_X(strlen(ACTIVE_TRUMP_MSG)), info_y + SHIFT_Y(1), game->active_trump < 2 ? 12 : 0);
+  } else if (game->active_trump == 4) {
+    render_text(renderer, ALLTRUMP_MSG, info_x, info_y + SHIFT_Y(1), 8);
+  } else {
+    render_text(renderer, NOTRUMP_MSG, info_x, info_y + SHIFT_Y(1), 8);
+  }
+
+  bool coinched = game->active_contract == COINCHE || game->active_contract == SURCOINCHE;
+
+  // Contract kind
+  if (game->active_contract == CAPOT || (coinched && game->contract_points == CAPOT_POINTS)) {
+    render_text(renderer, GOAL_MSG, info_x, info_y + SHIFT_Y(2), 8);
+    render_text(renderer, CAPOT_MSG, info_x + SHIFT_X(strlen(GOAL_MSG)), info_y + SHIFT_Y(2), 0);
+  } else if (game->active_contract == GENERAL || (coinched && game->contract_points == GENERAL_POINTS)) {
+    render_text(renderer, GOAL_MSG, info_x, info_y + SHIFT_Y(2), 8);
+    render_text(renderer, GENERAL_MSG, info_x + SHIFT_X(strlen(GOAL_MSG)), info_y + SHIFT_Y(2), 0);
+    char* general_attacker_str = game->general_attacker < 2 ? (game->general_attacker == 0 ? "S" : "W") : (game->general_attacker == 2 ? "N" : "E");
+    render_text(renderer, general_attacker_str, info_x + SHIFT_X(strlen(GOAL_MSG) + strlen(GENERAL_MSG)), info_y + SHIFT_Y(2), 12);
+    render_text(renderer, ")", info_x + SHIFT_X(strlen(GOAL_MSG) + strlen(GENERAL_MSG) + 1), info_y + SHIFT_Y(2), 0);
+  } else if (game->active_contract == CHOSENCOLOUR || coinched) {
+    render_text(renderer, CHOSENCOLOUR_MSG, info_x, info_y + SHIFT_Y(2), 8);
+    char points_str[4];
+    sprintf(points_str, "%d", game->contract_points);
+    render_text(renderer, points_str, info_x + SHIFT_X(strlen(CHOSENCOLOUR_MSG)), info_y + SHIFT_Y(2), 0);
+  }
+  if (game->active_contract == COINCHE) {
+    render_text(renderer, COINCHE_MSG, info_x, info_y + SHIFT_Y(3), 8);
+  } else if (game->active_contract == SURCOINCHE) {
+    render_text(renderer, SURCOINCHE_MSG, info_x, info_y + SHIFT_Y(3), 8);
   }
 }
