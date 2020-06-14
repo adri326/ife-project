@@ -191,7 +191,6 @@ bool display_main_menu() {
             best_scores.scores[n].wins,
             best_scores.scores[n].points
           );
-          char name_str[4];
           PRINT_CENTER(line_str, window_height / 4 + SHIFT_Y(2 + n), 0);
         }
     }
