@@ -9,6 +9,7 @@ set(SRC_FILES
   src/display.c
   src/rules.c
   src/game.c
+  src/leaderboards.c
 )
 
 set(
@@ -17,6 +18,7 @@ set(
   src/display.h
   src/rules.h
   src/game.h
+  src/leaderboards.h
 )
 
 add_executable(ife-project src/main.c ${SRC_FILES} ${HEADER_FILES})
@@ -89,3 +91,4 @@ endif()
 
 # TODO: change this
 add_compile_definitions(RESOURCES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
+add_compile_definitions(LEADERBOARDS_FILE="${CMAKE_CURRENT_SOURCE_DIR}/leaderboards.txt")

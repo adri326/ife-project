@@ -93,6 +93,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/game.h" />
+		<Unit filename="src/leaderboards.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/leaderboards.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

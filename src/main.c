@@ -2,11 +2,13 @@
 #include "display.h"
 #include "rules.h"
 #include "game.h"
+#include "leaderboards.h"
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ctype.h>
 
 // Otherwise the linker errors out due to SDL2 redefining `main` by default
 #define SDL_MAIN_HANDLED
@@ -124,6 +126,7 @@ bool display_main_menu() {
 #define SHIFT_Y(n) ((GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor * n)
 #define HANDLE_BUTTON(text, x, y) if (is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y))
 
+  BestScores best_scores = load_best_scores(0);
   // Display loop
   while (true) {
     SDL_Event event;
@@ -176,6 +179,21 @@ bool display_main_menu() {
         break;
       case 1:
         PRINT_CENTER("Leaderboards", window_height / 4, 9);
+        for (size_t n = 0; n < 10; n++) {
+          if (best_scores.scores[n].name[0] == 0) break;
+          char line_str[50];
+          sprintf(
+            line_str,
+            "%c%c%c: %zu wins / %zu points",
+            (char)toupper(best_scores.scores[n].name[0]),
+            (char)toupper(best_scores.scores[n].name[1]),
+            (char)toupper(best_scores.scores[n].name[2]),
+            best_scores.scores[n].wins,
+            best_scores.scores[n].points
+          );
+          char name_str[4];
+          PRINT_CENTER(line_str, window_height / 4 + SHIFT_Y(2 + n), 0);
+        }
     }
 
     SDL_RenderPresent(renderer);
