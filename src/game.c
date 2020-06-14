@@ -667,7 +667,7 @@ bool game_end_screen(Game* game) {
     char ns_score_str[50];
     char eq_score_str[50];
     sprintf(ns_score_str, "North/South: %d", turn_points(*game, NS));
-    sprintf(eq_score_str, "East/West: %d", turn_points(*game, NS));
+    sprintf(eq_score_str, "East/West: %d", turn_points(*game, EW));
 
     PRINT_CENTER(ns_score_str, window_height / 2 + SHIFT_Y(4), 0);
     PRINT_CENTER(eq_score_str, window_height / 2 + SHIFT_Y(5), 0);
