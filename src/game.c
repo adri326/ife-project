@@ -178,7 +178,7 @@ bool play_card(Game* game, size_t player_index, size_t card_index) {
 
 bool game_turn(Game* game) {
   uint8_t played_mask = 0b0000;
-  int current_player = game->trick_leader_position;
+  size_t current_player = (size_t)game->trick_leader_position;
   if (current_player < 0 || current_player >= 4) current_player = 0; // default to 0
 
   // Empty `pli`
@@ -191,9 +191,9 @@ bool game_turn(Game* game) {
     if (current_player == 0) {
       if (!players_turn(game)) return false;
     } else {
-      ai_turn(game, (size_t)current_player);
+      if (!ai_turn(game, current_player)) return false;
     }
-    game->trick_leader_position = leader_trick(game, (size_t)current_player);
+    game->trick_leader_position = leader_trick(game, current_player);
   }
 
   update_scores(game);

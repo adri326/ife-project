@@ -1,7 +1,7 @@
 #include "ai.h"
 #include "game.h"
 
-void ai_turn(Game* game, size_t player) {
+bool ai_turn(Game* game, size_t player) {
   if (
     game->pli[(player + 1) % 4].type == VOIDCARD && game->pli[(player + 2) % 4].type == VOIDCARD
     && game->pli[(player + 3) % 4].type == VOIDCARD) {
@@ -16,11 +16,11 @@ void ai_turn(Game* game, size_t player) {
       // checking what cards were already checked each time.
     } while (card_value(game->players[player].cards[card_index], *game) == 0 && i < 25);
 
-    play_card(game, player, card_index);
+    return play_card(game, player, card_index);
   } else if (can_ai_win(game, player)) {
-    play_card(game, player, ai_choose_winning_card(game, player));
+    return play_card(game, player, ai_choose_winning_card(game, player));
   } else {
-    play_card(game, player, ai_choose_weakest_card(game, player));
+    return play_card(game, player, ai_choose_weakest_card(game, player));
   }
 }
 

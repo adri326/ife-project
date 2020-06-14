@@ -8,8 +8,9 @@
 /** Entry point for the mid-game AI
 * @param game - The current Game
 * @param player - The AI's index
+* @returns true on success, false if the AI's turn was interrupted
 **/
-void ai_turn(Game* game, size_t player);
+bool ai_turn(Game* game, size_t player);
 
 /**
 Check if the AI can beat the current leader.
