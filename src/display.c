@@ -331,6 +331,9 @@ void render_glyph(SDL_Renderer* renderer, char glyph, int32_t x, int32_t y, uint
       case '"':
         index = 54;
         break;
+      case '^':
+        index = 56;
+        break;
       case ' ':
         index = 63;
         break;
@@ -473,11 +476,11 @@ bool is_button_hovered(
   uint32_t button_y,
   int32_t mouse_x,
   int32_t mouse_y) {
-  int32_t width = (GLYPH_WIDTH * 2 + (GLYPH_MARGIN + GLYPH_WIDTH) * strlen(text)) * zoom_factor;
+  int32_t width = (GLYPH_WIDTH * 2 + (GLYPH_MARGIN + GLYPH_WIDTH) * strlen(text) - 2) * zoom_factor;
   button_x -= GLYPH_WIDTH * zoom_factor;
   button_y -= GLYPH_HEIGHT * zoom_factor;
-  return mouse_x >= button_x && mouse_y >= button_y && mouse_x <= button_x + width
-         && mouse_y <= button_y + GLYPH_HEIGHT * zoom_factor * 3;
+  return mouse_x >= button_x + zoom_factor * 2 && mouse_y >= button_y + zoom_factor * 2 && mouse_x <= button_x + width
+         && mouse_y <= button_y + GLYPH_HEIGHT * zoom_factor * 3 - zoom_factor * 2;
 }
 
 void render_round(SDL_Renderer* renderer, Game* game, uint32_t x, uint32_t y) {
@@ -545,7 +548,7 @@ void render_score(SDL_Renderer* renderer, size_t player_index, int score, uint32
 extern uint32_t window_width;
 extern uint32_t window_height;
 
-void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t current_player) {
+void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t current_player, bool render_extras) {
   SDL_SetRenderDrawColor(renderer, BG_RED, BG_GREEN, BG_BLUE, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
 
@@ -553,7 +556,7 @@ void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t cur
   uint32_t deck_y = window_height - (CARD_HEIGHT + DECK_PADDING) * 4;
 
   render_deck(renderer, &game->players[0], deck_x, deck_y, hovered_card);
-  render_round(renderer, game, window_width / 2, window_height / 2);
+  if (render_extras) render_round(renderer, game, window_width / 2, window_height / 2);
   render_ai_deck(renderer, &game->players[1], 0, window_height / 2 - CARD_HEIGHT * 2);
   render_ai_deck(renderer, &game->players[2], window_width / 2 - CARD_WIDTH * 4, 0);
   render_ai_deck(
@@ -563,7 +566,7 @@ void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t cur
     window_height / 2 - CARD_HEIGHT * 2);
 
   // Scores
-  {
+  if (render_extras) {
     render_score(
       renderer,
       0,
@@ -605,71 +608,116 @@ void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t cur
   uint32_t info_y =
     window_height - (GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * 3 - CARD_HEIGHT * 2 * zoom_factor;
 
-  // Contracted team
-  render_text(renderer, CONTRACTED_TEAM_MSG, info_x, info_y, 8);
-  if (game->contracted_team == NS) {
-    render_text(renderer, "N/S", info_x + SHIFT_X(strlen(CONTRACTED_TEAM_MSG)), info_y, 0);
-  } else {
-    render_text(renderer, "E/W", info_x + SHIFT_X(strlen(CONTRACTED_TEAM_MSG)), info_y, 0);
+  // Extras - contract, coinched, etc.
+  if (render_extras) {
+    // Contracted team
+    render_text(renderer, CONTRACTED_TEAM_MSG, info_x, info_y, 8);
+    if (game->contracted_team == NS) {
+      render_text(renderer, "N/S", info_x + SHIFT_X(strlen(CONTRACTED_TEAM_MSG)), info_y, 0);
+    } else {
+      render_text(renderer, "E/W", info_x + SHIFT_X(strlen(CONTRACTED_TEAM_MSG)), info_y, 0);
+    }
+
+    // Active trump
+    if (game->active_trump < 4) {
+      render_text(renderer, ACTIVE_TRUMP_MSG, info_x, info_y + SHIFT_Y(1), 8);
+      char str[2] = {128 + 37 + game->active_trump, 0};
+      render_text(
+        renderer,
+        str,
+        info_x + SHIFT_X(strlen(ACTIVE_TRUMP_MSG)),
+        info_y + SHIFT_Y(1),
+        game->active_trump < 2 ? 12 : 0);
+    } else if (game->active_trump == 4) {
+      render_text(renderer, ALLTRUMP_MSG, info_x, info_y + SHIFT_Y(1), 8);
+    } else {
+      render_text(renderer, NOTRUMP_MSG, info_x, info_y + SHIFT_Y(1), 8);
+    }
+
+    bool coinched = game->active_contract == COINCHE || game->active_contract == SURCOINCHE;
+
+    // Contract kind
+    if (game->active_contract == CAPOT || (coinched && game->contract_points == CAPOT_POINTS)) {
+      render_text(renderer, GOAL_MSG, info_x, info_y + SHIFT_Y(2), 8);
+      render_text(renderer, CAPOT_MSG, info_x + SHIFT_X(strlen(GOAL_MSG)), info_y + SHIFT_Y(2), 0);
+    } else if (
+      game->active_contract == GENERAL || (coinched && game->contract_points == GENERAL_POINTS)) {
+      render_text(renderer, GOAL_MSG, info_x, info_y + SHIFT_Y(2), 8);
+      render_text(renderer, GENERAL_MSG, info_x + SHIFT_X(strlen(GOAL_MSG)), info_y + SHIFT_Y(2), 0);
+      char* general_attacker_str = game->general_attacker < 2
+                                    ? (game->general_attacker == 0 ? "S" : "W")
+                                    : (game->general_attacker == 2 ? "N" : "E");
+      render_text(
+        renderer,
+        general_attacker_str,
+        info_x + SHIFT_X(strlen(GOAL_MSG) + strlen(GENERAL_MSG)),
+        info_y + SHIFT_Y(2),
+        12);
+      render_text(
+        renderer,
+        ")",
+        info_x + SHIFT_X(strlen(GOAL_MSG) + strlen(GENERAL_MSG) + 1),
+        info_y + SHIFT_Y(2),
+        0);
+    } else if (game->active_contract == CHOSENCOLOUR || coinched) {
+      render_text(renderer, CHOSENCOLOUR_MSG, info_x, info_y + SHIFT_Y(2), 8);
+      char points_str[4];
+      sprintf(points_str, "%d", game->contract_points);
+      render_text(
+        renderer,
+        points_str,
+        info_x + SHIFT_X(strlen(CHOSENCOLOUR_MSG)),
+        info_y + SHIFT_Y(2),
+        0);
+    }
+
+    // Coinche
+    if (game->active_contract == COINCHE) {
+      render_text(renderer, COINCHE_MSG, info_x, info_y + SHIFT_Y(3), 8);
+    } else if (game->active_contract == SURCOINCHE) {
+      render_text(renderer, SURCOINCHE_MSG, info_x, info_y + SHIFT_Y(3), 8);
+    }
   }
+}
 
-  // Active trump
-  if (game->active_trump < 4) {
-    render_text(renderer, ACTIVE_TRUMP_MSG, info_x, info_y + SHIFT_Y(1), 8);
-    char str[2] = {128 + 37 + game->active_trump, 0};
-    render_text(
-      renderer,
-      str,
-      info_x + SHIFT_X(strlen(ACTIVE_TRUMP_MSG)),
-      info_y + SHIFT_Y(1),
-      game->active_trump < 2 ? 12 : 0);
-  } else if (game->active_trump == 4) {
-    render_text(renderer, ALLTRUMP_MSG, info_x, info_y + SHIFT_Y(1), 8);
-  } else {
-    render_text(renderer, NOTRUMP_MSG, info_x, info_y + SHIFT_Y(1), 8);
-  }
-
-  bool coinched = game->active_contract == COINCHE || game->active_contract == SURCOINCHE;
-
-  // Contract kind
+void render_bids(SDL_Renderer* renderer, Game* game) {
+  if (game->active_contract == -1) return;
+#define PRINT_CENTER(text, y, color) render_text(renderer, (text), window_width / 2 - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, color)
+  char attacker_str[32] = {0};
+  char contract_str[32] = {0};
+  char* pos_str = game->general_attacker < 2 ? (game->general_attacker == 0 ? "South" : "West") : (game->general_attacker == 2 ? "North" : "East");
+  sprintf(attacker_str, "Player %s bid:", pos_str);
+  bool coinched = (game->active_contract == COINCHE || game->active_contract == SURCOINCHE);
   if (game->active_contract == CAPOT || (coinched && game->contract_points == CAPOT_POINTS)) {
-    render_text(renderer, GOAL_MSG, info_x, info_y + SHIFT_Y(2), 8);
-    render_text(renderer, CAPOT_MSG, info_x + SHIFT_X(strlen(GOAL_MSG)), info_y + SHIFT_Y(2), 0);
-  } else if (
-    game->active_contract == GENERAL || (coinched && game->contract_points == GENERAL_POINTS)) {
-    render_text(renderer, GOAL_MSG, info_x, info_y + SHIFT_Y(2), 8);
-    render_text(renderer, GENERAL_MSG, info_x + SHIFT_X(strlen(GOAL_MSG)), info_y + SHIFT_Y(2), 0);
-    char* general_attacker_str = game->general_attacker < 2
-                                   ? (game->general_attacker == 0 ? "S" : "W")
-                                   : (game->general_attacker == 2 ? "N" : "E");
-    render_text(
-      renderer,
-      general_attacker_str,
-      info_x + SHIFT_X(strlen(GOAL_MSG) + strlen(GENERAL_MSG)),
-      info_y + SHIFT_Y(2),
-      12);
-    render_text(
-      renderer,
-      ")",
-      info_x + SHIFT_X(strlen(GOAL_MSG) + strlen(GENERAL_MSG) + 1),
-      info_y + SHIFT_Y(2),
-      0);
-  } else if (game->active_contract == CHOSENCOLOUR || coinched) {
-    render_text(renderer, CHOSENCOLOUR_MSG, info_x, info_y + SHIFT_Y(2), 8);
-    char points_str[4];
-    sprintf(points_str, "%d", game->contract_points);
-    render_text(
-      renderer,
-      points_str,
-      info_x + SHIFT_X(strlen(CHOSENCOLOUR_MSG)),
-      info_y + SHIFT_Y(2),
-      0);
+    if (game->active_trump < 4) {
+      sprintf(contract_str, "capot as %c", 128 + 37 + game->active_trump);
+    } else if (game->active_trump == ALLTRUMP) {
+      sprintf(contract_str, "capot, all trump");
+    } else {
+      sprintf(contract_str, "capot, no trump");
+    }
+  } else if (game->active_contract == GENERAL || (coinched && game->contract_points == GENERAL_POINTS)) {
+    if (game->active_trump < 4) {
+      sprintf(contract_str, "general as %c", 128 + 37 + game->active_trump);
+    } else if (game->active_trump == ALLTRUMP) {
+      sprintf(contract_str, "general, all trump");
+    } else {
+      sprintf(contract_str, "general, no trump");
+    }
+  } else {
+    if (game->active_trump < 4) {
+      sprintf(contract_str, "%d points as %c", game->contract_points, 128 + 37 + game->active_trump);
+    } else if (game->active_trump == ALLTRUMP) {
+      sprintf(contract_str, "%d points, all trump", game->contract_points);
+    } else {
+      sprintf(contract_str, "%d points, no trump", game->contract_points);
+    }
   }
-
-  // Coinche
+  PRINT_CENTER(attacker_str, window_height / 2 + SHIFT_Y(-2), 0);
+  PRINT_CENTER(contract_str, window_height / 2 + SHIFT_Y(-1), 0);
   if (game->active_contract == COINCHE) {
-    render_text(renderer, COINCHE_MSG, info_x, info_y + SHIFT_Y(3), 8);
+    PRINT_CENTER("coinche", window_height / 2 + SHIFT_Y(-1), 0);
   } else if (game->active_contract == SURCOINCHE) {
-    render_text(renderer, SURCOINCHE_MSG, info_x, info_y + SHIFT_Y(3), 8);
+    PRINT_CENTER("surcoinche", window_height / 2 + SHIFT_Y(-1), 0);
   }
 }

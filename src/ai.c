@@ -114,11 +114,13 @@ void ai_announce_contract(Game* game, size_t player) {
       game->contract_points = 120;
       game->active_trump = (TrumpColor)j;
       game->contracted_team = (Teams)player % 2;
+      game->general_attacker = player;
     } else if (number_stong_cards == 3 && game->contract_points < 80) {
       game->active_contract = CHOSENCOLOUR;
       game->contract_points = 80;
       game->active_trump = (TrumpColor)j;
       game->contracted_team = (Teams)player % 2;
+      game->general_attacker = player;
     }
   }
 }

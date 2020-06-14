@@ -109,8 +109,8 @@ void display_test() {
     .players = {{}, {}, {}, {}},
     .active_trump = TRUMP_HEARTS,
     .contract_points = 500,
-    .active_contract = SURCOINCHE,
-    .general_attacker = 1,
+    .active_contract = -1,
+    .general_attacker = -1,
     .pli = {
       {.type = VOIDCARD},
       {.type = VOIDCARD},
@@ -121,6 +121,13 @@ void display_test() {
   init_cards(cards);
   shuffle_cards(cards);
   distribute_cards(cards, &game);
+  for (size_t n = 0; n < 4; n++) {
+    game.players[n].n_cards = 5;
+  }
+  dealing_phase(&game, 0);
+  for (size_t n = 0; n < 4; n++) {
+    game.players[n].n_cards = 8;
+  }
 
   play_all_turns(&game, 1);
   // ai_turn(&game, 1);

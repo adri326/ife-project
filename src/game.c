@@ -77,7 +77,7 @@ bool players_turn(Game* game) {
     }
 
     // Render the current game state
-    render_all(renderer, game, hovered_card, 0);
+    render_all(renderer, game, hovered_card, 0, true);
 
     SDL_RenderPresent(renderer);
   }
@@ -153,7 +153,7 @@ bool play_card(Game* game, size_t player_index, size_t card_index) {
     }
 
     // Render the current game state
-    render_all(renderer, game, -1, player_index);
+    render_all(renderer, game, -1, player_index, true);
 
     float progress = (float)(SDL_GetTicks() - loop_start) / anim_length;
     uint32_t distance = (1 - INTERPOLATE_EASE_IN_OUT(progress)) * (CARD_WIDTH + 1);
@@ -271,6 +271,43 @@ void shuffle_cards(Card cards[32]) {
   }
 }
 
+bool anim_dealer(Game* game, size_t dealer) {
+#ifndef TEST_ENV
+  uint32_t loop_start = SDL_GetTicks();
+  const uint32_t anim_length = game->general_attacker == dealer ? 1000 : 500;
+  while (SDL_GetTicks() - loop_start < anim_length) {
+    SDL_Event event;
+    SLEEP(25);
+
+    // Poll events
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_KEYUP) { // Key pressed
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
+            return false;
+        }
+      } else if (event.type == SDL_QUIT) { // Window closed
+        return false;
+      }
+    }
+
+    // Render the current game state
+    render_all(renderer, game, -1, -1, false);
+    render_bids(renderer, game);
+    if (dealer == 1) {
+      render_text(renderer, "<", CARD_WIDTH * 2 * zoom_factor + GLYPH_WIDTH * zoom_factor, window_height / 2 + GLYPH_HEIGHT * zoom_factor / 2, 8);
+    } else if (dealer == 2) {
+      render_text(renderer, "^", window_width / 2 - GLYPH_WIDTH * zoom_factor / 2, CARD_HEIGHT * zoom_factor + GLYPH_HEIGHT * zoom_factor, 8);
+    } else if (dealer == 3) {
+      render_text(renderer, ">", window_width - CARD_WIDTH * 2 * zoom_factor - GLYPH_WIDTH * zoom_factor, window_height / 2 + GLYPH_HEIGHT * zoom_factor / 2, 8);
+    }
+
+    SDL_RenderPresent(renderer);
+  }
+#endif
+  return true;
+}
+
 int dealing_phase(Game* game, size_t dealer) {
   game->contract_points = 0;
   for (int i = 1; i < 5; i++) {
@@ -279,6 +316,7 @@ int dealing_phase(Game* game, size_t dealer) {
     } else {
       ai_announce_contract(game, (dealer + i) % 4);
     }
+    if (!anim_dealer(game, (dealer + i) % 4)) return 2;
   }
   int previous_contract_points = game->contract_points;
   if (game->contract_points == 0) { // nobody took a contract, we have to give new cards.
@@ -295,6 +333,7 @@ int dealing_phase(Game* game, size_t dealer) {
     } else {
       ai_announce_contract(game, player);
     }
+    if (!anim_dealer(game, player)) return 2;
     player = (player + 1) % 4;
     if (previous_contract_points == game->contract_points) {
       consecutive_pass = consecutive_pass + 1;
@@ -307,6 +346,205 @@ int dealing_phase(Game* game, size_t dealer) {
   return 1;
 }
 
+/*
+Dear code reader,
+Sorry.
+*/
 bool player_announce_contract(Game* game) {
+#ifdef TEST_ENV
   return true;
+#else
+  int screen = 0;
+  int32_t mouse_x = 0;
+  int32_t mouse_y = 0;
+
+  #define PRINT_CENTER_AROUND(text, x, y, color) render_text(renderer, (text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, color)
+  #define PRINT_CENTER(text, y, color) PRINT_CENTER_AROUND(text, window_width / 2, y, color)
+  #define BUTTON_CENTER_AROUND(text, x, y, color) render_button( \
+    renderer, \
+    (text), \
+    x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, \
+    y, \
+    is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y), \
+    color)
+  #define BUTTON_CENTER(text, y, color) BUTTON_CENTER_AROUND(text, window_width / 2, y, color)
+  #define SHIFT_Y(n) ((GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * (n))
+  #define SHIFT_X(n) ((n) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor)
+  #define HANDLE_BUTTON(text, x, y) if (is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y))
+  #define COLUMN_SPACING (GLYPH_WIDTH * 10 * zoom_factor)
+  #define BUTTON_SPACING ((GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor * 3)
+
+  int points = game->contract_points + 10;
+  int contract_type = 0;
+  int color = 0;
+  while (true) {
+    SDL_Event event;
+    SLEEP(50);
+
+    // Poll events
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_KEYUP) { // Key pressed
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
+            return false;
+        }
+      } else if (event.type == SDL_QUIT) { // Window closed
+        return false;
+      } else if (event.type == SDL_MOUSEMOTION) { // Mouse moved
+        mouse_x = event.motion.x;
+        mouse_y = event.motion.y;
+      } else if (event.type == SDL_MOUSEBUTTONDOWN) { // Mouse pressed: handle buttons
+        switch (screen) {
+          case 0:
+            if (game->general_attacker >= 0) {
+              render_bids(renderer, game);
+            }
+            HANDLE_BUTTON("Pass", window_width / 2, window_height / 2 + SHIFT_Y(2)) {
+              return true;
+            }
+            HANDLE_BUTTON("Bid", window_width / 2, window_height / 2 + SHIFT_Y(4)) {
+              screen = 1;
+              continue;
+            }
+            if (game->general_attacker == 3 && game->active_contract != SURCOINCHE) {
+              HANDLE_BUTTON(game->active_contract == COINCHE ? "Surcoinche" : "Coinche", window_width / 2, window_height / 2 + SHIFT_Y(6)) {
+                if (game->active_contract == COINCHE) game->active_contract = SURCOINCHE;
+                else game->active_contract = COINCHE;
+                return true;
+              }
+            }
+            break;
+          case 1:
+            HANDLE_BUTTON("Points:", window_width / 2 - COLUMN_SPACING, window_height / 2 + SHIFT_Y(-8)) {
+              contract_type = 0;
+            }
+            HANDLE_BUTTON("Capot", window_width / 2, window_height / 2 + SHIFT_Y(-8)) {
+              contract_type = 1;
+            }
+            HANDLE_BUTTON("General", window_width / 2 + COLUMN_SPACING, window_height / 2 + SHIFT_Y(-8)) {
+              contract_type = 2;
+            }
+
+            HANDLE_BUTTON("-", window_width / 2 - COLUMN_SPACING - GLYPH_WIDTH * 4 * zoom_factor, window_height / 2 + SHIFT_Y(-5)) {
+              if (points > game->contract_points + 10) points -= 10;
+            }
+            HANDLE_BUTTON("+", window_width / 2 - COLUMN_SPACING + GLYPH_WIDTH * 4 * zoom_factor, window_height / 2 + SHIFT_Y(-5)) {
+              if (points < 240) points += 10;
+            }
+            for (size_t current_color = 0; current_color < 4; current_color++) {
+              HANDLE_BUTTON(".", window_width / 2 + BUTTON_SPACING * (2 * current_color - 3) / 2, window_height / 2 + SHIFT_Y(0)) {
+                color = current_color;
+              }
+            }
+            HANDLE_BUTTON(
+              "All trump",
+              window_width / 2 - (strlen("All trump") + 2) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2,
+              window_height / 2 + SHIFT_Y(3)
+            ) {
+              color = 4;
+            }
+            HANDLE_BUTTON(
+              "No trump",
+              window_width / 2 + (strlen("No trump") + 2) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2,
+              window_height / 2 + SHIFT_Y(3)
+            ) {
+              color = 5;
+            }
+            HANDLE_BUTTON("Bid!", window_width / 2, window_height / 2 + SHIFT_Y(6)) {
+              game->active_contract = contract_type == 0 ? CHOSENCOLOUR : contract_type == 1 ? CAPOT : GENERAL;
+              game->contract_points = contract_type == 0 ? points : contract_type == 1 ? CAPOT_POINTS : GENERAL_POINTS;
+              game->active_trump = color;
+              return true;
+            }
+        }
+      }
+    }
+
+    // Render the current game state
+    render_all(renderer, game, -1, -1, false);
+
+    switch (screen) {
+      case 0:
+        if (game->general_attacker >= 0) {
+          render_bids(renderer, game);
+        }
+        BUTTON_CENTER("Pass", window_height / 2 + SHIFT_Y(2), 0);
+        BUTTON_CENTER("Bid", window_height / 2 + SHIFT_Y(4), 0);
+        if (game->general_attacker == 3 && game->active_contract != SURCOINCHE) {
+          BUTTON_CENTER(game->active_contract == COINCHE ? "Surcoinche" : "Coinche", window_height / 2 + SHIFT_Y(6), 0);
+        }
+        break;
+      case 1:
+        {
+          char points_str[4];
+          sprintf(points_str, "%d", points);
+          render_button(
+            renderer,
+            "Points:",
+            window_width / 2 - COLUMN_SPACING - strlen("Points:") * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2,
+            window_height / 2 + SHIFT_Y(-8),
+            contract_type == 0,
+            0
+          );
+          PRINT_CENTER_AROUND(points_str, window_width / 2 - COLUMN_SPACING, window_height / 2 + SHIFT_Y(-5), 0);
+          BUTTON_CENTER_AROUND("-", window_width / 2 - COLUMN_SPACING - GLYPH_WIDTH * 4 * zoom_factor, window_height / 2 + SHIFT_Y(-5), 0);
+          BUTTON_CENTER_AROUND("+", window_width / 2 - COLUMN_SPACING + GLYPH_WIDTH * 4 * zoom_factor, window_height / 2 + SHIFT_Y(-5), 0);
+
+          render_button(
+            renderer,
+            "Capot",
+            window_width / 2 - strlen("Capot") * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2,
+            window_height / 2 + SHIFT_Y(-8),
+            contract_type == 1,
+            0
+          );
+
+          render_button(
+            renderer,
+            "General",
+            window_width / 2 + COLUMN_SPACING - strlen("General") * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2,
+            window_height / 2 + SHIFT_Y(-8),
+            contract_type == 2,
+            0
+          );
+
+          PRINT_CENTER("Trump:", window_height / 2 + SHIFT_Y(-2), 8);
+
+          for (size_t current_color = 0; current_color < 4; current_color++) {
+            char color_str[2] = {128 + 37 + current_color, 0};
+            render_button(
+              renderer,
+              color_str,
+              window_width / 2 + BUTTON_SPACING * (2 * current_color - 3) / 2 - (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2,
+              window_height / 2 + SHIFT_Y(0),
+              color == current_color,
+              current_color < 2 ? 12 : 0
+            );
+          }
+
+          render_button(
+            renderer,
+            "All trump",
+            window_width / 2 - (strlen("All trump") + 2) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor,
+            window_height / 2 + SHIFT_Y(3),
+            color == 4,
+            0
+          );
+          render_button(
+            renderer,
+            "No trump",
+            window_width / 2 + 2 * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor,
+            window_height / 2 + SHIFT_Y(3),
+            color == 5,
+            0
+          );
+
+          BUTTON_CENTER("Bid!", window_height / 2 + SHIFT_Y(6), 0);
+          break;
+        }
+    }
+
+    SDL_RenderPresent(renderer);
+  }
+#endif
 }
