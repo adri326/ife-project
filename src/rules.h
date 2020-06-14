@@ -149,4 +149,9 @@ int leader_trick(Game* game, size_t player_index);
 */
 bool card_wins(Game* game, Card card, size_t player_index);
 
+/**
+To check a declaration.
+*/
+int declaration_check(Card cards[5]);
+
 #endif // RULES_H

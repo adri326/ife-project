@@ -406,3 +406,76 @@ int leader_trick(Game* game, size_t player_index) {
     return game->trick_leader_position;
   }
 }
+
+int declaration_check(Card cards[5])
+{
+    if (cards[0].value==cards[1].value
+        && cards[0].value==cards[2].value
+        && cards[0].value==cards[3].value)
+        //4 cards of the same value = square
+    {
+        switch (cards[0].value)
+        {
+        case 11:
+            return 200; //4 jacks
+            break;
+        case 9:
+            return 150;//4 9
+            break;
+        case 13:
+            return 100;//4 Kings
+            break;
+         case 12:
+            return 100;//4 Queens
+            break;
+        case 10:
+            return 100;//4 10
+            break;
+        case 14:
+            return 100;//4 Aces
+            break;
+        default:
+            return 0;//no relevant 4 cards
+        }
+    } else {
+        bool any_10=false,any_king=false,any_queen=false,any_jack=false,
+        any_ace=false;
+        for (int i=0;i<5;i++) {
+            switch (cards[i].value)
+                {
+                case 11:
+                    any_jack=true;
+                    break;
+                case 13:
+                    any_king=true;
+                    break;
+                case 12:
+                    any_queen=true;
+                    break;
+                case 10:
+                    any_10=true;
+                    break;
+                case 14:
+                    any_ace=true;
+                    break;
+                }
+        }
+        if (any_ace==true && any_king==true && any_queen==true) {
+            //following cards detected
+            if (any_jack==true)
+            {
+                if (any_10==true)
+                {
+                    return 100; //5 following cards
+                } else {
+                    return 50; //4 following cards
+                }
+            } else {
+                return 20; //3 following cards
+            }
+        } else {
+            return 0; //no following cards
+        }
+    }
+}
+int declaration_check(Card card1,Card card2,Card card3,Card card4,Card card5)

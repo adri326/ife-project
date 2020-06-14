@@ -63,4 +63,6 @@ this function manages the dealing phase. Returns
 */
 int dealing_phase(Game* game,size_t dealer);
 
+
+
 #endif // GAME_H
