@@ -478,4 +478,4 @@ int declaration_check(Card cards[5])
         }
     }
 }
-int declaration_check(Card card1,Card card2,Card card3,Card card4,Card card5)
+
