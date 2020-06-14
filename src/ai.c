@@ -18,9 +18,13 @@ bool ai_turn(Game* game, size_t player) {
 
     return play_card(game, player, card_index);
   } else if (can_ai_win(game, player)) {
-    return play_card(game, player, ai_choose_winning_card(game, player));
+    size_t card = ai_choose_winning_card(game, player);
+    if (card >= game->players[player].n_cards) card = game->players[player].n_cards - 1;
+    return play_card(game, player, card);
   } else {
-    return play_card(game, player, ai_choose_weakest_card(game, player));
+    size_t card = ai_choose_weakest_card(game, player);
+    if (card >= game->players[player].n_cards) card = game->players[player].n_cards - 1;
+    return play_card(game, player, card);
   }
 }
 

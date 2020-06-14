@@ -92,6 +92,10 @@ this function manages the dealing phase. Returns
 */
 int dealing_phase(Game* game,size_t dealer);
 
-
+/** Prints the end screen, telling the player wether or not they won
+* @param game - The current game
+* @returns true if the user entered their initials, false otherwise
+**/
+bool game_end_screen(Game* game);
 
 #endif // GAME_H

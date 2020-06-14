@@ -1,8 +1,10 @@
 #include "game.h"
 #include "ai.h"
+#include "leaderboards.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ctype.h>
 
 #ifndef TEST_ENV
 #include "display.h"
@@ -272,7 +274,10 @@ bool play_all_turns(Game* game, size_t first_player_index) {
     if (!game_turn(game)) return false;
   }
 
-  return true;
+  Teams winning_team = contract_check(*game);
+  game->winning_team = winning_team;
+
+  return game_end_screen(game);
 }
 
 void distribute_cards(Card cards[32], Game* game) {
@@ -389,6 +394,22 @@ int dealing_phase(Game* game, size_t dealer) {
   return 1;
 }
 
+#define PRINT_CENTER_AROUND(text, x, y, color) render_text(renderer, (text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, color)
+#define PRINT_CENTER(text, y, color) PRINT_CENTER_AROUND(text, window_width / 2, y, color)
+#define BUTTON_CENTER_AROUND(text, x, y, color) render_button( \
+  renderer, \
+  (text), \
+  x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, \
+  y, \
+  is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y), \
+  color)
+#define BUTTON_CENTER(text, y, color) BUTTON_CENTER_AROUND(text, window_width / 2, y, color)
+#define SHIFT_Y(n) ((GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * (n))
+#define SHIFT_X(n) ((n) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor)
+#define HANDLE_BUTTON(text, x, y) if (is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y))
+#define COLUMN_SPACING (GLYPH_WIDTH * 10 * zoom_factor)
+#define BUTTON_SPACING ((GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor * 3)
+
 /*
 Dear code reader,
 Sorry.
@@ -400,22 +421,6 @@ bool player_announce_contract(Game* game) {
   int screen = 0;
   int32_t mouse_x = 0;
   int32_t mouse_y = 0;
-
-  #define PRINT_CENTER_AROUND(text, x, y, color) render_text(renderer, (text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, color)
-  #define PRINT_CENTER(text, y, color) PRINT_CENTER_AROUND(text, window_width / 2, y, color)
-  #define BUTTON_CENTER_AROUND(text, x, y, color) render_button( \
-    renderer, \
-    (text), \
-    x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, \
-    y, \
-    is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y), \
-    color)
-  #define BUTTON_CENTER(text, y, color) BUTTON_CENTER_AROUND(text, window_width / 2, y, color)
-  #define SHIFT_Y(n) ((GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * (n))
-  #define SHIFT_X(n) ((n) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor)
-  #define HANDLE_BUTTON(text, x, y) if (is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y))
-  #define COLUMN_SPACING (GLYPH_WIDTH * 10 * zoom_factor)
-  #define BUTTON_SPACING ((GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor * 3)
 
   int points = game->contract_points + 10;
   if (game->contract_points < 80) points = 80;
@@ -588,4 +593,89 @@ bool player_announce_contract(Game* game) {
     SDL_RenderPresent(renderer);
   }
 #endif
+}
+
+bool game_end_screen(Game* game) {
+#ifndef TEST_ENV
+  // int32_t mouse_x = 0;
+  // int32_t mouse_y = 0;
+  // Display loop
+  char name[3] = {0, 0, 0};
+  while (true) {
+    SDL_Event event;
+    SLEEP(50);
+
+    // Poll events
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_KEYUP) { // Key pressed
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
+            return false;
+            break;
+          case SDLK_BACKSPACE:
+            if (game->winning_team == NS) {
+              if (name[2]) name[2] = 0;
+              else if (name[1]) name[1] = 0;
+              else if (name[0]) name[0] = 0;
+            }
+            break;
+          case SDLK_RETURN:
+            if (game->winning_team == NS && name[0] && name[1] && name[2]) {
+              Score score = get_score(name);
+              score.name[0] = name[0];
+              score.name[1] = name[1];
+              score.name[2] = name[2];
+              score.wins++;
+              score.points += turn_points(*game, NS);
+              set_score(score);
+            }
+            return true;
+          default:
+            if (event.key.keysym.sym >= 'a' && event.key.keysym.sym <= 'z') {
+              if (!name[0]) name[0] = (char)toupper(event.key.keysym.sym);
+              else if (!name[1]) name[1] = (char)toupper(event.key.keysym.sym);
+              else if (!name[2]) name[2] = (char)toupper(event.key.keysym.sym);
+            }
+        }
+      } else if (event.type == SDL_QUIT) { // Window closed
+        return false;
+      } else if (event.type == SDL_MOUSEMOTION) { // Mouse moved: update hovered_card
+        // mouse_x = event.motion.x;
+        // mouse_y = event.motion.y;
+      } else if (event.type == SDL_MOUSEBUTTONDOWN) { // Mouse pressed: play card if possible
+
+      }
+    }
+
+    // Render the current game state
+
+    SDL_SetRenderDrawColor(renderer, BG_RED, BG_GREEN, BG_BLUE, SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(renderer);
+
+    if (game->winning_team == NS) {
+      PRINT_CENTER("You won!", window_height / 2 + SHIFT_Y(-1), 0);
+      PRINT_CENTER("Enter your initials:", window_height / 2 + SHIFT_Y(0), 9);
+      char name_str[4] = "---";
+      if (name[0]) name_str[0] = name[0];
+      if (name[1]) name_str[1] = name[1];
+      if (name[2]) name_str[2] = name[2];
+      PRINT_CENTER(name_str, window_height / 2 + SHIFT_Y(2), 0);
+    } else {
+      PRINT_CENTER("You lost...", window_height / 2 + SHIFT_Y(-1), 0);
+    }
+
+    char ns_score_str[50];
+    char eq_score_str[50];
+    sprintf(ns_score_str, "North/South: %d", turn_points(*game, NS));
+    sprintf(eq_score_str, "East/West: %d", turn_points(*game, NS));
+
+    PRINT_CENTER(ns_score_str, window_height / 2 + SHIFT_Y(4), 0);
+    PRINT_CENTER(eq_score_str, window_height / 2 + SHIFT_Y(5), 0);
+
+    PRINT_CENTER("Press enter to continue...", window_height / 2 + SHIFT_Y(8), 0);
+
+    SDL_RenderPresent(renderer);
+  }
+#endif
+  return true;
 }

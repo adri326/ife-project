@@ -123,7 +123,7 @@ bool display_main_menu() {
   is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y), \
   color)
 #define BUTTON_CENTER(text, y, color) BUTTON_CENTER_AROUND(text, window_width / 2, y, color)
-#define SHIFT_Y(n) ((GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor * n)
+#define SHIFT_Y(n) ((GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * (n))
 #define HANDLE_BUTTON(text, x, y) if (is_button_hovered((text), x - strlen(text) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor / 2, y, mouse_x, mouse_y))
 
   BestScores best_scores = load_best_scores(0);

@@ -23,6 +23,13 @@ BestScores load_best_scores(size_t page) {
       }
       for (size_t n = 0; n < 10; n++) {
         if (res.scores[n].wins < wins) {
+          for (size_t o = 8; o < 10; o--) {
+            res.scores[o + 1].wins = res.scores[o].wins;
+            res.scores[o + 1].points = res.scores[o].points;
+            res.scores[o + 1].name[0] = res.scores[o].name[0];
+            res.scores[o + 1].name[1] = res.scores[o].name[1];
+            res.scores[o + 1].name[2] = res.scores[o].name[2];
+          }
           res.scores[n].wins = wins;
           res.scores[n].points = points;
           // The compiler is gonna unfold it anyways
@@ -82,8 +89,6 @@ void set_score(Score score) {
       char name[3];
       size_t wins;
       size_t points;
-      fpos_t pos;
-      fgetpos(file, &pos);
       if (fscanf(file, "%c%c%c %zu %zu\n", &name[0], &name[1], &name[2], &wins, &points) != 5) {
         printf("Error reading line %d. Skipping!\n", line);
         continue;
@@ -111,15 +116,11 @@ void append_score(Score score) {
       char name[3];
       size_t wins;
       size_t points;
-      fpos_t pos;
-      fgetpos(file, &pos);
       if (fscanf(replica, "%c%c%c %zu %zu\n", &name[0], &name[1], &name[2], &wins, &points) != 5) {
         printf("Error reading line %d. Skipping!\n", line);
         continue;
       }
-      if (name[0] != score.name[0] || name[1] != score.name[1] || name[2] != score.name[2]) {
-        fprintf(file, "%c%c%c %zu %zu\n", name[0], name[1], name[2], wins, points);
-      }
+      fprintf(file, "%c%c%c %zu %zu\n", name[0], name[1], name[2], wins, points);
     } while (!feof(replica));
     fprintf(file, "%c%c%c %zu %zu\n", score.name[0], score.name[1], score.name[2], score.wins, score.points);
   } else {
