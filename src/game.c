@@ -209,7 +209,14 @@ bool game_turn(Game* game) {
 }
 
 void update_scores(Game* game) {
-  // TODO
+  // Maybe do an animation?
+  game->players[game->trick_leader_position].trick_points_total += trick_points(
+    game->pli[0],
+    game->pli[1],
+    game->pli[2],
+    game->pli[3],
+    *game
+  );
 }
 
 bool play_all_turns(Game* game, size_t first_player_index) {

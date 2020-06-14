@@ -92,7 +92,7 @@ typedef struct Game Game;
 
 /**
 The goal of this function is to compute the points of a team at the end of a 8
-tricks turn. To do so, we give all the informations about the game and the 4
+tricks match. To do so, we give all the informations about the game and the 4
 players to the function. The function will then return the points of the wanted
 team which is an integer. This function doesn't check if the contract was
 realized or not, at this point we already know it. Another function will do it.
@@ -118,7 +118,7 @@ realize a switch to enter the winning team.
 #define defenders_win(team_to_switch) (!(team_to_switch))
 
 /**
-The following function will simply do a sum of the trick points.
+The following function will simply do a sum of a trick's points.
 The identification of the value of each card will be done in an other function.
 The "10 of der" is computed too.
 */

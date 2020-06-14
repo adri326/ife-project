@@ -57,6 +57,9 @@ static SDL_Rect card_rect;
 static SDL_Texture* glyphs[16][8][8];
 extern uint32_t zoom_factor;
 
+#define SHIFT_Y(n) ((GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * (n))
+#define SHIFT_X(n) ((n) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor)
+
 bool init_textures(SDL_Renderer* renderer, uint32_t factor) {
   SDL_Surface* outlines_raw = IMG_Load(RESOURCES_DIR "card_outlines.png");
   if (!outlines_raw) return false;
@@ -157,7 +160,7 @@ bool init_textures(SDL_Renderer* renderer, uint32_t factor) {
     0xffb000ff, // orange
     0xb0b0b0ff, // light gray
     0x808080ff, // gray
-    0x0000ffff, // light blue
+    0x606060ff, // dark gray
     0x00ff00ff, // light green
     0x00ffffff, // light cyan
     0xff0000ff, // light red
@@ -437,6 +440,14 @@ void render_ai_deck(SDL_Renderer* renderer, Player* ai, uint32_t x, uint32_t y) 
   }
 }
 
+void render_score(SDL_Renderer* renderer, size_t player_index, int score, uint32_t x, uint32_t y) {
+  char* player_index_str = player_index < 2 ? (player_index == 0 ? "S:" : "W:") : (player_index == 2 ? "N:" : "E:");
+  render_text(renderer, player_index_str, x, y, 9);
+  char score_str[7];
+  sprintf(score_str, "%dpts", score);
+  render_text(renderer, score_str, x + SHIFT_X(2), y, 9);
+}
+
 extern uint32_t window_width;
 extern uint32_t window_height;
 
@@ -458,14 +469,20 @@ void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t cur
   render_ai_deck(renderer, &game->players[2], window_width / 2 - CARD_WIDTH * 4, 0);
   render_ai_deck(renderer, &game->players[3], window_width - CARD_WIDTH * 8, window_height / 2 - CARD_HEIGHT * 2);
 
+  // Scores
+  {
+    render_score(renderer, 0, game->players[0].trick_points_total, deck_x + 2 * zoom_factor + (CARD_WIDTH + DECK_PADDING) * (game->players[0].n_cards) * zoom_factor / 2, window_height - GLYPH_HEIGHT * zoom_factor - 2 * zoom_factor);
+    render_score(renderer, 1, game->players[1].trick_points_total, 2 * zoom_factor, window_height / 2 - CARD_HEIGHT * 2 - 2 * zoom_factor - GLYPH_HEIGHT * zoom_factor);
+    render_score(renderer, 2, game->players[2].trick_points_total, window_width / 2 + 2 * zoom_factor + CARD_WIDTH * zoom_factor, 2 * zoom_factor);
+    render_score(renderer, 3, game->players[3].trick_points_total, window_width - 2 * zoom_factor - (GLYPH_WIDTH + GLYPH_MARGIN) * 8 * zoom_factor, window_height / 2 - CARD_HEIGHT * 2 - 2 * zoom_factor - GLYPH_HEIGHT * zoom_factor);
+  }
+
   if (current_player == 0) {
     render_text(renderer, YOUR_TURN_MSG, window_width / 2 - (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor * (strlen(YOUR_TURN_MSG) - 1) / 2, deck_y - GLYPH_HEIGHT * 2 * zoom_factor, 15);
   }
 
   uint32_t info_x = GLYPH_MARGIN * zoom_factor;
   uint32_t info_y = window_height - (GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * 3 - CARD_HEIGHT * 2 * zoom_factor;
-#define SHIFT_Y(n) ((GLYPH_HEIGHT + GLYPH_MARGIN) * zoom_factor * (n))
-#define SHIFT_X(n) ((n) * (GLYPH_WIDTH + GLYPH_MARGIN) * zoom_factor)
 
   // Contracted team
   render_text(renderer, CONTRACTED_TEAM_MSG, info_x, info_y, 8);
@@ -504,6 +521,8 @@ void render_all(SDL_Renderer* renderer, Game* game, int hovered_card, size_t cur
     sprintf(points_str, "%d", game->contract_points);
     render_text(renderer, points_str, info_x + SHIFT_X(strlen(CHOSENCOLOUR_MSG)), info_y + SHIFT_Y(2), 0);
   }
+
+  // Coinche
   if (game->active_contract == COINCHE) {
     render_text(renderer, COINCHE_MSG, info_x, info_y + SHIFT_Y(3), 8);
   } else if (game->active_contract == SURCOINCHE) {
