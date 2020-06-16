@@ -344,7 +344,7 @@ END_TEST()
 #define CARD_VALUE_TEST(name, act_trump, card_type, ...)                                           \
   BEGIN_TEST(name) {                                                                               \
     int values[8] = {__VA_ARGS__};                                                                 \
-    Game game = {.active_trump = act_trump};                                                       \
+    Game game = {.active_trump = (int)act_trump};                                                  \
     for (int n = 7; n < 15; n++) {                                                                 \
       Card card = {.value = n, .type = card_type};                                                 \
       ASSERT_EQ_PRI(values[n - 7], card_value(card, game), "%d");                                  \
@@ -418,8 +418,8 @@ BEGIN_TEST(leader_trick) {
           .active_trump = (trump + 1) % 4,
           .trick_cut = false,
           .trick_leader_position = 0,
-          .trick_color = trump,
-          .pli = {{.type = trump, .value = order[value]}, {.type = trump, .value = order[value + 1]}}
+          .trick_color = (int)trump,
+          .pli = {{.type = (int)trump, .value = order[value]}, {.type = (int)trump, .value = order[value + 1]}}
         };
         ASSERT_EQ_MSG(1, leader_trick(&game, 1), "Expected player 1 to be the trick leader, got player 0. Trump(%d), CardValue(%zu // %zu)", (trump + 1) % 4, order[value], order[value + 1]);
       }
@@ -428,8 +428,8 @@ BEGIN_TEST(leader_trick) {
           .active_trump = (trump + 1) % 4,
           .trick_cut = false,
           .trick_leader_position = 0,
-          .trick_color = trump,
-          .pli = {{.type = trump, .value = order[value + 1]}, {.type = trump, .value = order[value]}}
+          .trick_color = (int)trump,
+          .pli = {{.type = (int)trump, .value = order[value + 1]}, {.type = (int)trump, .value = order[value]}}
         };
         ASSERT_EQ_MSG(0, leader_trick(&game, 1), "Expected player 0 to be the trick leader, got player 1. Trump(%d), CardValue(%zu // %zu)", (trump + 1) % 4, order[value + 1], order[value]);
       }
@@ -445,8 +445,8 @@ BEGIN_TEST(leader_trick) {
           .active_trump = trump,
           .trick_cut = false,
           .trick_leader_position = 0,
-          .trick_color = trump,
-          .pli = {{.type = trump, .value = order[value]}, {.type = trump, .value = order[value + 1]}}
+          .trick_color = (int)trump,
+          .pli = {{.type = (int)trump, .value = order[value]}, {.type = (int)trump, .value = order[value + 1]}}
         };
         ASSERT_EQ_MSG(1, leader_trick(&game, 1), "Expected player 1 to be the trick leader, got player 0. Trump(%d), CardValue(%zu // %zu)", trump, order[value], order[value + 1]);
       }
@@ -455,8 +455,8 @@ BEGIN_TEST(leader_trick) {
           .active_trump = trump,
           .trick_cut = false,
           .trick_leader_position = 0,
-          .trick_color = trump,
-          .pli = {{.type = trump, .value = order[value + 1]}, {.type = trump, .value = order[value]}}
+          .trick_color = (int)trump,
+          .pli = {{.type = (int)trump, .value = order[value + 1]}, {.type = (int)trump, .value = order[value]}}
         };
         ASSERT_EQ_MSG(0, leader_trick(&game, 1), "Expected player 0 to be the trick leader, got player 1. Trump(%d), CardValue(%zu // %zu)", trump, order[value + 1], order[value]);
       }
@@ -470,10 +470,9 @@ BEGIN_TEST(leader_trick) {
       {
         Game game = {
           .active_trump = (trump + 1) % 4,
-          .trick_cut = false,
           .trick_leader_position = 0,
-          .trick_color = trump,
-          .pli = {{.type = trump, .value = order[value]}, {.type = (trump + 1) % 4, .value = 7}},
+          .trick_color = (int)trump,
+          .pli = {{.type = (int)trump, .value = order[value]}, {.type = ((int)trump + 1) % 4, .value = 7}},
           .trick_cut = true,
         };
         ASSERT_EQ_MSG(1, leader_trick(&game, 1), "Expected player 1 to be the trick leader, got player 0. Trump(%d), CardValue(%zu // %d)", (trump + 1) % 4, order[value], 7);
@@ -481,10 +480,9 @@ BEGIN_TEST(leader_trick) {
       {
         Game game = {
           .active_trump = (trump + 1) % 4,
-          .trick_cut = false,
           .trick_leader_position = 0,
-          .trick_color = (trump + 1) % 4,
-          .pli = {{.type = (trump + 1) % 4, .value = 7}, {.type = trump, .value = order[value]}},
+          .trick_color = ((int)trump + 1) % 4,
+          .pli = {{.type = ((int)trump + 1) % 4, .value = 7}, {.type = (int)trump, .value = order[value]}},
           .trick_cut = false,
         };
         ASSERT_EQ_MSG(0, leader_trick(&game, 1), "Expected player 0 to be the trick leader, got player 1. Trump(%d), CardValue(%d // %zu)", (trump + 1) % 4, 7, order[value]);
