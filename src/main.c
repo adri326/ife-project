@@ -9,6 +9,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <ctype.h>
+#include <stdio.h>
+#ifdef _WIN32
+#include <io.h>
+#elif defined __linux__
+#include <sys/stat.h>
+#endif
 
 // Otherwise the linker errors out due to SDL2 redefining `main` by default
 #define SDL_MAIN_HANDLED
@@ -28,6 +34,20 @@ void display_destroy(void);
 bool display_main_menu(void);
 
 int main(int argc, char* argv[]) {
+#ifdef _WIN32
+  if (_access(LEADERBOARDS_FILE, 0) == -1) {
+    FILE* leaderboards = fopen(LEADERBOARDS_FILE, "w");
+    fclose(leaderboards);
+  }
+#elif defined __linux__
+  {
+    struct stat leaderboards_buffer;
+    if (stat(LEADERBOARDS_FILE, &leaderboards_buffer) != 0) {
+      FILE* leaderboards = fopen(LEADERBOARDS_FILE, "w");
+      fclose(leaderboards);
+    }
+  }
+#endif
   srand(time(0));
 
   display_init();
