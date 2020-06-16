@@ -358,7 +358,14 @@ bool anim_dealer(Game* game, size_t dealer) {
 
 int dealing_phase(Game* game, size_t dealer) {
   game->contract_points = 0;
-  for (int i = 1; i < 5; i++) {
+  if ((dealer + 1) % 4 == 0) {
+    if (!player_announce_contract(game)) return 2;
+  } else {
+    ai_announce_contract(game, (dealer + 1) % 4);
+    if (!anim_dealer(game, (dealer + 1) % 4)) return 2;
+  }
+  int previous_contract_points = game->contract_points;
+  for (int i = 2; i < 5; i++) {
     if ((dealer + i) % 4 == 0) {
       if (!player_announce_contract(game)) return 2;
     } else {
@@ -366,7 +373,6 @@ int dealing_phase(Game* game, size_t dealer) {
       if (!anim_dealer(game, (dealer + i) % 4)) return 2;
     }
   }
-  int previous_contract_points = game->contract_points;
   if (game->contract_points == 0) { // nobody took a contract, we have to give new cards.
     return 0;
   } else if (game->contract_points == previous_contract_points) {
