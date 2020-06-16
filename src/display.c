@@ -1,6 +1,7 @@
 #include "display.h"
 #include <SDL2/SDL_image.h>
 #include <ctype.h>
+#include <stdio.h>
 
 bool zoom_surface(SDL_Surface* src, SDL_Surface* dst) {
   if (src->w == 0 || src->h == 0) return false;
