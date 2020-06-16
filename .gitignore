@@ -17,3 +17,7 @@ projet/obj
 .vs/
 leaderboards.txt
 leaderboards.txt~
+*.aux
+*.log
+*.out
+*.toc
