@@ -123,6 +123,8 @@ void append_score(Score score) {
       fprintf(file, "%c%c%c %zu %zu\n", name[0], name[1], name[2], wins, points);
     } while (!feof(replica));
     fprintf(file, "%c%c%c %zu %zu\n", score.name[0], score.name[1], score.name[2], score.wins, score.points);
+    fclose(file);
+    fclose(replica);
   } else {
     printf("Error opening file!\n");
   }
