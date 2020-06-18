@@ -21,9 +21,9 @@ BestScores load_best_scores(size_t page) {
         printf("Error reading line %d. Skipping!\n", line);
         continue;
       }
-      for (size_t n = 0; n < 10; n++) {
+      for (int n = 0; n < 10; n++) {
         if (res.scores[n].wins < wins) {
-          for (size_t o = 8; o < 10; o--) {
+          for (int o = 8; o >= n; o--) {
             res.scores[o + 1].wins = res.scores[o].wins;
             res.scores[o + 1].points = res.scores[o].points;
             res.scores[o + 1].name[0] = res.scores[o].name[0];
